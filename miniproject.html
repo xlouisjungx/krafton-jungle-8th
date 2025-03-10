@@ -5,31 +5,56 @@
         <meta charset="UTF-8">
         <title>KRAFTON JUNGLE SUNDAY</title>
         <style>
+            * {
+                font-family: 'Jua', sans-serif;
+            }
+
             .wrap {
                 margin: auto;
                 width: 900px;
+            }
+
+            .posting-box {
+            margin: 10px auto 30px auto;
+            width:500px;
+
+            border: 3px solid black;
+            border-radius: 5px;
+
+            padding: 25px;
             }
         </style>
     </head>
 
     <body>
-        <h2>회원가입 페이지</h2>
-        <hr>
+        <div class="wrap">
+            <div class="posting-box">
+                <h2>회원가입 페이지</h2>
+            </div>
+        </div>
         
-        <label for="f_name">성 :</label><br>
-            <input type="text" id="f_name" name="f_name" value=" "> 
-        <br>
-
-        <label for="l_name">이름 : </label><br>
-        <input type="text" id="l_name" name="l_name" value=" ">
-        <br>
-
-        <label for="password">비밀번호 : </label><br>
-        <input type="text" id="password" name="password" value=" ">
-        <br>
+        <div class="wrap">
+            <div class="posting-box">
+                <label for="f_name">성 :</label><br>
+                <input type="text" id="f_name" name="f_name" value=" "> 
+            <br>
+    
+            <label for="l_name">이름 : </label><br>
+            <input type="text" id="l_name" name="l_name" value=" ">
+            <br>
+    
+            <label for="password">비밀번호 : </label><br>
+            <input type="text" id="password" name="password" value=" ">
+            <br>  
+            </div>
+        </div>
          
-        <button>회원가입</button>
-        <hr>
+        <div class="wrap">
+            <div class="posting-box">
+                <button>회원가입</button>
+                <button>취소</button>
+            </div>
+        </div>
     </body>
 
 </html>
