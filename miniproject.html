@@ -1,78 +1,108 @@
 <!DOCTYPE html>
 <html lang="ko">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>Jungle Sunday</title>
-        <style>
-            * {
-                font-family: 'Jua', sans-serif;
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Jungle Sunday</title>
+    <style>
+        * {
+            font-family: 'Jua', sans-serif;
+        }
 
-            .wrap {
-                margin: auto;
-                width: 900px;
-            }
+        .wrap {
+            margin: auto;
+            width: 900px;
+        }
 
-            .posting-box {
-                margin: 10px auto 30px auto;
-                width:500px;
-                border: 3px solid black;
-                border-radius: 5px;
-                padding: 25px;
-            }
-        </style>
-    </head>
+        .posting-box {
+            margin: 10px auto 30px auto;
+            width: 500px;
+            border: 3px solid black;
+            border-radius: 5px;
+            padding: 25px;
+        }
+    </style>
+</head>
 
-    <body>
-        <div class="wrap">
-            <div class="posting-box">
-                <h2>회원가입 페이지</h2>
-            </div>
+<body>
+    <div class="wrap">
+        <div class="posting-box">
+            <h2>회원가입 페이지</h2>
         </div>
+    </div>
+
+    <div class="wrap">
+        <div class="posting-box">
+            <label for="username">이름 :</label><br>
+            <input type="text" id="username" name="username">
+            <br>
+
+            <label for="class">강의실 :</label><br>
+            <input type="class" id="class" name="password">
+            <br>
+
+            <label for="password">비밀번호 :</label><br>
+            <input type="password" id="password" name="password">
+            <br>
+            <label for="password2">비밀번호 재확인:</label><br>
+            <input type="password2" id="password2" name="password2">
+            <br>
+        </div>
+
+        <script>
+            async function saveUsername() {
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+                const password2 = document.getElementById("password2").value;
         
-        <div class="wrap">
-            <div class="posting-box">
-                <label for="username">이름 :</label><br>
-                <input type="text" id="username" name="username"> 
-                <br>
-    
-                <label for="password">비밀번호 :</label><br>
-                <input type="password" id="password" name="password">
-                <br>
-            </div>
-
-            <script>
-                async function saveUsername() {
-                    const username = document.getElementById("username").value;
-                    const password = document.getElementById("password").value;
-                    
-                    if (!username || !password) {
-                        alert("아이디와 비밀번호를 모두 입력하세요!");
-                        return;
-                    }
-
-                    const response = await fetch("http://localhost:5001/main_post", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ username, password })
-                    });
-
-                    const result = await response.json();
-                    alert(result.message); // 성공 또는 실패 메시지를 표시
+                // 비밀번호 재확인
+                if (password !== password2) {
+                    alert("비밀번호가 일치하지 않습니다.");
+                    return;
                 }
-
+        
+                if (!username || !password) {
+                    alert("아이디와 비밀번호를 모두 입력하세요!");
+                    return;
+                }
+        
+                // 로컬 스토리지에 아이디와 비밀번호 저장
+                localStorage.setItem("username", username);
+                localStorage.setItem("password", password);
+        
+                alert("회원가입 성공! 아이디와 비밀번호가 로컬 스토리지에 저장되었습니다.");
+        
+                // 서버로 데이터를 전송하는 부분
+                const response = await fetch("http://localhost:5001/save-id", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+        
+                const result = await response.json();
+                
                 // 회원가입 버튼 클릭 시 saveUsername 함수 실행
                 document.querySelector('#signupButton').addEventListener('click', saveUsername);
-            </script>
+                if (result.result === 'success') {
+                    alert(result.message); // 회원가입 완료!
+                    document.getElementById("username").value = "";
+                    document.getElementById("password").value = "";
+                    document.getElementById("password2").value = "";
+                    document.getElementById("class").value = "";
+                } else {
+                    alert(result.message); // 실패 메시지
+                }
+            }
+        
+        </script>        
+    </div>
+
+    <div class="wrap">
+        <div class="posting-box">
+            <button id="signupButton">회원가입</button>
+            <button>취소</button>
         </div>
-         
-        <div class="wrap">
-            <div class="posting-box">
-                <button id="signupButton">회원가입</button>
-                <button>취소</button>
-            </div>
-        </div>
-    </body>
+    </div>
+</body>
 
 </html>

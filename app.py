@@ -30,7 +30,7 @@ def save_user():
 
     return jsonify({'result': 'success', 'message': '회원가입 완료!'})
 
-@app.route('/main_post', methods=['GET', 'POST'])
+@app.route('/save_id', methods=['GET', 'POST'])
 def handle_post():
     if request.method == 'GET':
       result = list(db.post.find())
