@@ -1,9 +1,9 @@
-<!Doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 
     <head>
         <meta charset="UTF-8">
-        <title>KRAFTON JUNGLE SUNDAY</title>
+        <title>Jungle Sunday</title>
         <style>
             * {
                 font-family: 'Jua', sans-serif;
@@ -15,13 +15,11 @@
             }
 
             .posting-box {
-            margin: 10px auto 30px auto;
-            width:500px;
-
-            border: 3px solid black;
-            border-radius: 5px;
-
-            padding: 25px;
+                margin: 10px auto 30px auto;
+                width:500px;
+                border: 3px solid black;
+                border-radius: 5px;
+                padding: 25px;
             }
         </style>
     </head>
@@ -35,23 +33,43 @@
         
         <div class="wrap">
             <div class="posting-box">
-                <label for="f_name">성 :</label><br>
-                <input type="text" id="f_name" name="f_name" value=" "> 
-            <br>
+                <label for="username">이름 :</label><br>
+                <input type="text" id="username" name="username"> 
+                <br>
     
-            <label for="l_name">이름 : </label><br>
-            <input type="text" id="l_name" name="l_name" value=" ">
-            <br>
-    
-            <label for="password">비밀번호 : </label><br>
-            <input type="text" id="password" name="password" value=" ">
-            <br>  
+                <label for="password">비밀번호 :</label><br>
+                <input type="password" id="password" name="password">
+                <br>
             </div>
+
+            <script>
+                async function saveUsername() {
+                    const username = document.getElementById("username").value;
+                    const password = document.getElementById("password").value;
+                    
+                    if (!username || !password) {
+                        alert("아이디와 비밀번호를 모두 입력하세요!");
+                        return;
+                    }
+
+                    const response = await fetch("http://localhost:5001/main_post", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const result = await response.json();
+                    alert(result.message); // 성공 또는 실패 메시지를 표시
+                }
+
+                // 회원가입 버튼 클릭 시 saveUsername 함수 실행
+                document.querySelector('#signupButton').addEventListener('click', saveUsername);
+            </script>
         </div>
          
         <div class="wrap">
             <div class="posting-box">
-                <button>회원가입</button>
+                <button id="signupButton">회원가입</button>
                 <button>취소</button>
             </div>
         </div>
