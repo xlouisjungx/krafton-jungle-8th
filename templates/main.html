@@ -33,6 +33,9 @@
     .profile-id {
       font-size: 30px;
     }
+    .delete-button {
+      margin-top: 20px;
+    }
   </style>
 
   <!-- JS Function -->
@@ -65,7 +68,9 @@
                                 <article class="tile is-child box">
                                   <a href="/user_info">
                                     <img class="profile-image">
-                                    <p class="profile-id">name<p>
+                                    <div>
+                                      <p class="profile-id">name<p>
+                                    </div>
                                   </a>
                                   <p class="subtitle">${post_time}</p>
                                   <figure class="image">
@@ -79,10 +84,30 @@
                                   <a herf="#" onclick="dislikePost('${post_id}')">
                                     <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
                                   </a>
+                                  <div class="buttons delete-button">
+                                    <button class="button is-danger" onclick="deletePost('${post_id}')">삭제</button>
+                                  </div>
                                 </article>
                       </div>`;
       $("#post-display").append(temp_html);
     }
+
+    function deletePost(id) {
+        $.ajax({
+          type: "POST",
+          url: "/main/post/delete",
+          data: { post_id_give: id },
+          success: function (response) {
+            if (response['result'] == 'success') {
+              alert('삭제 완료!')
+              $("#post-display").html("");
+              showPosts();
+            } else {
+              alert('삭제 실패ㅠㅠ')
+            }
+          }
+        });
+      }
 
     function likePost(id) {
         $.ajax({

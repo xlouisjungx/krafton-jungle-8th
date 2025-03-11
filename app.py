@@ -1,7 +1,8 @@
 from bson import ObjectId
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, g
 from flask.json.provider import JSONProvider
+from flask_jwt_extended import JWTManager, verify_jwt_in_request, jwt_required, get_jwt_identity
 app = Flask(__name__)
 
 from pymongo import MongoClient
@@ -16,7 +17,6 @@ class CustomJSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
-
 class CustomJSONProvider(JSONProvider):
     def dumps(self, obj, **kwargs):
         return json.dumps(obj, **kwargs, cls=CustomJSONEncoder)
@@ -26,20 +26,41 @@ class CustomJSONProvider(JSONProvider):
     
 app.json = CustomJSONProvider(app)
 
+@app.before_request
+def load_current_user():
+    try:
+      verify_jwt_in_request(optional=True)  # JWT가 있으면 검증, 없으면 패스
+      g.current_user = get_jwt_identity()  # 현재 사용자 정보 저장
+    except:
+      g.current_user = 'Hi'  # 예외 발생 시 로그인되지 않은 상태로 설정
+
+@app.context_processor
+def inject_user():
+   return dict(username = g.current_user)
+
+
 #MAIN HTML
 @app.route('/main')
 def main():
-    return render_template('main.html',
-                           title="Jungle Sunday",
-                           heading="Jungle Sunday",
-                           sub_head="일요일을 맛있게 보내자!",
-                           post="글쓰기",
-                           )
+    try:
+      #verify_jwt_in_request(optional=True)
+      #current_user = get_jwt_identity()
+      if not g.current_user:
+         return redirect(url_for('/'))
+
+      return render_template('main.html',
+                            title="Jungle Sunday",
+                            heading="Jungle Sunday",
+                            sub_head="일요일을 맛있게 보내자!",
+                            post="글쓰기",
+                            ) 
+    except:
+      return redirect(url_for('/'))
 
 @app.route('/main/post', methods=['GET', 'POST'])
 def handle_post():
     if request.method == 'GET':
-      result = list(db.post.find({}))
+      result = list(db.post.find().sort({'_id': -1}))
       return jsonify({'result': 'success', 'posts': result})
     
     elif request.method == 'POST':
@@ -63,7 +84,19 @@ def handle_post():
 
       db.post.insert_one(post)
       return jsonify({'result': 'success'})
-    
+
+@app.route('/main/post/<poster_id>', methods=['POST'])
+def delete_post():
+  temp_id_receive = request.form['post_id_give']
+  id_receive = ObjectId(temp_id_receive)
+
+  result = db.post.delete_one({'_id': id_receive})
+
+  if result.deleted_count == 1:
+      return jsonify({'result': 'success'})
+  else:
+      return jsonify({'result': 'failure'})
+
 @app.route('/main/post/like', methods=['POST'])
 def handle_like():
   temp_id_receive = request.form['post_id_give']
@@ -82,7 +115,7 @@ def handle_dislike():
 #POST HTML
 @app.route('/post')
 def post():
-   return render_template('post.html',
+  return render_template('post.html',
                           title="글 작성",
                           heading="글 작성",
                           post="게시하기",
