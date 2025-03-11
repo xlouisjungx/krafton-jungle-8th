@@ -1,9 +1,8 @@
 from bson import ObjectId
 import json
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, g
+from flask import Flask, render_template, request, jsonify, redirect, url_for, g, make_response
 from flask.json.provider import JSONProvider
-from flask_jwt_extended import JWTManager, verify_jwt_in_request, jwt_required, get_jwt_identity
 from flask_cors import CORS 
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -34,31 +33,41 @@ class CustomJSONProvider(JSONProvider):
     
 app.json = CustomJSONProvider(app)
 
+
 @app.before_request
 def load_current_user():
-    try:
-      verify_jwt_in_request(optional=True)  # JWT가 있으면 검증, 없으면 패스
-      g.current_user = get_jwt_identity()  # 현재 사용자 정보 저장
-    except:
-      g.current_user = 'Hi'  # 예외 발생 시 로그인되지 않은 상태로 설정
+    g.current_user = None
+    if request.endpoint != 'login':  # '/login' 라우트에서는 토큰 검증을 하지 않음
+        # 다른 라우트에서는 토큰을 검증하고, 'g.current_user'를 설정
+        token = request.cookies.get('access_token')
+        print(token)
+        if token:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            user_id = payload["user_id"]
+            g.current_user = user_id #토큰 삽입 수정 필요??
+        else:
+            g.current_user = None
 
+#전체 템플릿에서 사용할 전역변수 설정
 @app.context_processor
 def inject_user():
    return dict(username = g.current_user)
 
 #GENERAL ROUTE
 @app.route('/')
-def original():
-   i
+def index():
+    if g.current_user != None:
+        return redirect(url_for('main'))
+    else:
+        return redirect(url_for('login'))
+
 
 #MAIN HTML
 @app.route('/main')
 def main():
     try:
-      #verify_jwt_in_request(optional=True)
-      #current_user = get_jwt_identity()
       if not g.current_user:
-         return redirect(url_for('/'))
+         return redirect(url_for('index'))
 
       return render_template('main.html',
                             title="Jungle Sunday",
@@ -68,7 +77,7 @@ def main():
                             delete="삭제",
                             ) 
     except:
-      return redirect(url_for('/'))
+      return redirect(url_for('index'))
 
 @app.route('/main/post', methods=['GET', 'POST'])
 def handle_post():
@@ -165,7 +174,6 @@ def login_user():
 
     # 사용자 조회
     user = db.users.find_one({"email": Email_receive})
-    print(user)
     if not user:
         return jsonify({"result": "error", "message": "사용자가 존재하지 않습니다. 회원가입 해주세요."})
 
@@ -175,12 +183,14 @@ def login_user():
 
     # JWT 생성
     payload = {
-        "user_id": str(user["_id"]),
+        "user_id": str(user["ID"]),
         "exp": datetime.now() + timedelta(hours=1)  # 토큰 만료 시간 설정
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    response = make_response(jsonify({"result": "success", "token": token}))
+    response.set_cookie('access_token', token, httponly=True, secure=False, samesite='Strict', max_age=3600)
 
-    return jsonify({"result": "success", "token": token})
+    return response
 
 # 보호된 API 예시 (JWT 인증)
 @app.route("/protected", methods=["GET"])
