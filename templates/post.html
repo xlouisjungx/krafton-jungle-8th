@@ -79,7 +79,7 @@
 
       $.ajax({
         type: "POST", // POST 방식으로 요청하겠다.
-        url: "/main_post", // /memo라는 url에 요청하겠다.
+        url: "/main/post", // /memo라는 url에 요청하겠다.
         data: { 
           poster_id_give: poster_id,
           image_give: image,
@@ -91,7 +91,7 @@
           if (response["result"] == "success") {
             alert("포스팅 성공!");
             // 3. 성공 시 페이지 새로고침하기
-            window.location.reload();
+            window.location.href = "/main";
           } else {
             alert("서버 오류!")
           }

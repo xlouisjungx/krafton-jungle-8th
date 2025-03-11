@@ -12,6 +12,9 @@
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
+  <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+  <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
   <title>{{title}}</title>
 
   <style>
@@ -19,6 +22,16 @@
       display: flex;
       justify-content: right;
       margin-right: 5%;
+    }
+    .like-buttons {
+      margin: auto;
+    }
+    .profile-image {
+      width: 100px;
+      height: 100px;
+    }
+    .profile-id {
+      font-size: 30px;
     }
   </style>
 
@@ -32,13 +45,12 @@
     function showPosts() {
       $.ajax({
         type: "GET",
-        url: "/main_post",
+        url: "/main/post",
         data: {},
         success: function (response) {
           let posts = response["posts"];
           for (let i = 0; i < posts.length; i++) {
-            console.log(posts[i])
-            makePost(posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["post_time"])
+            makePost(posts[i]["_id"], posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["dislike"], posts[i]["post_time"])
           }
 
           if (posts.length === 0) {
@@ -48,20 +60,63 @@
       })
     }
 
-    function makePost(image, poster_id, post_title, post_content, link, likes, post_time) {
-      console.log(image)
-      let temp_html = `<div class="tile is-parent">
-                          <article class="tile is-child box">
-                            <p class="subtitle">${post_time}</p>
-                            <figure class="image">
-                              <img src="${image}">
-                            </figure>
-                            <p class="title">${post_title}</p>
-                            <p class="subtitle">${post_content}</p>
-                          </article>
+    function makePost(post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
+      let temp_html = /*html*/`<div class="tile is-parent">
+                                <article class="tile is-child box">
+                                  <a href="/user_info">
+                                    <img class="profile-image">
+                                    <p class="profile-id">name<p>
+                                  </a>
+                                  <p class="subtitle">${post_time}</p>
+                                  <figure class="image">
+                                    <img src="${image}">
+                                  </figure>
+                                  <p class="title">${post_title}</p>
+                                  <p class="subtitle">${post_content}</p>
+                                  <a herf="#" onclick="likePost('${post_id}')">
+                                    <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes">${likes}</span>
+                                  </a>
+                                  <a herf="#" onclick="dislikePost('${post_id}')">
+                                    <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
+                                  </a>
+                                </article>
                       </div>`;
       $("#post-display").append(temp_html);
     }
+
+    function likePost(id) {
+        $.ajax({
+          type: "POST",
+          url: "/main/post/like",
+          data: { post_id_give: id },
+          success: function (response) {
+            if (response['result'] == 'success') {
+              alert('맛있어요 완료!')
+              $("#post-display").html("");
+              showPosts();
+            } else {
+              alert('맛있어요 실패ㅠㅠ')
+            }
+          }
+        });
+      }
+
+      function dislikePost(id) {
+        $.ajax({
+          type: "POST",
+          url: "/main/post/dislike",
+          data: { post_id_give: id },
+          success: function (response) {
+            if (response['result'] == 'success') {
+              alert('맛없어요 완료!')
+              $("#post-display").html("");
+              showPosts();
+            } else {
+              alert('맛없어요 실패ㅠㅠ')
+            }
+          }
+        });
+      }
   </script>
 </head>
 
