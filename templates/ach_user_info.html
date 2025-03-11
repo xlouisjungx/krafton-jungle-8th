@@ -22,7 +22,7 @@
     .upside-box {
       display: flex;
       justify-content: center;
-      margin-top: 100px;
+
     }
 
     .downside-box {
@@ -31,21 +31,38 @@
     }
 
     .profile-img-circle {
-      width: 30%;
+      width: 40%;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
       background-color: black;
       margin: 20px;
     }
 
-    .info-box {
-      margin-left: 300px;
-      margin-top: 10px;
+    .side {
+      padding: 0 110px;
     }
 
-    .info-sub-box {
-      margin: 20px 0;
+    .card {
+      height: 900px;
     }
+
+    .card-content {
+      height: 800px;
+    }
+
+    .info {
+
+      padding: 10px;
+    }
+
+    .buttonset {
+      padding-top: 40px;
+    }
+
+    .profiletitle {
+      padding: 1.5rem 1.5rem;
+    }
+
   </style>
 
   <!-- JS Function -->
@@ -68,34 +85,63 @@
 
 <body>
   <div class="container">
-    <div class="upside-box">
-      <div class="profile-img-circle">
-        <img>
+    <div class="side">
+      <section class="profiletitle">
+        <div class="has-text-centered">
+          <h2 class="title">프로필</h2>
+        </div>
+      </section>
+      <div class="side">
+        <div class="card">
+          <div class="card-content">
+            <div class="upside-box">
+              <div class="profile-img-circle">
+                <img>
+              </div>
+            </div>
+
+            <br>
+            <br>
+            <div class="info">
+              <div class="info-box">
+                <div class="info-sub-box">
+                  <h4 class="title is-4">이름</h1>
+                    <h5 id="lecture-num" class="subtitle is-5">dsd</h5>
+                </div>
+
+                <br>
+
+                <div class="info-sub-box">
+                  <h4 id="lecture-title" class="title is-4">강의실</h4>
+                  <h5 id="lecture-num" class="subtitle is-5">cs</h5>
+                </div>
+
+                <br>
+
+                <div class="info-sub-box">
+                  <h4 id="os-title" class="title is-4">사용 운영 체제</h4>
+                  <h5 id="os-text" class="subtitle is-5">csc</h5>
+                </div>
+              </div>
+
+              <br>
+
+
+              <hr>
+
+              <div class="columns">
+                <div class="column">
+                  <button class="button is-primary">수정</button>
+                  <button class="button is-danger">취소</button>
+
+                  <button class="button is-danger is-light">로그아웃</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="info-box">
-      <h1 class="title is-1">Name</h1>
-
-      <div class="info-sub-box">
-        <h4 id="lecture-title" class="title is-4">강의실 호수</h4>
-        <h5 id="lecture-num" class="subtitle is-5">Subtitle 4</h5>
-      </div>
-
-      <div class="info-sub-box">
-        <h4 id="os-title" class="title is-4">사용 운영 체제</h4>
-        <h5 id="os-text" class="subtitle is-5">Subtitle 4</h5>
-      </div>
-
-      <div class="info-sub-box">
-        <h4 id="place-title" class="title is-4">위치</h4>
-        <h5 id="place-text" class="subtitle is-5">Subtitle 4</h5>
-      </div>
-    </div>
-
-    <div class="buttons downside-box">
-      <button class="button is-primary">수정</button>
-      <button class="button is-danger">취소</button>
     </div>
   </div>
 

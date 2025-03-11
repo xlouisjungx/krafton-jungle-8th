@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
-db = client.jungle_sunday
+db = client.junglesunday
 
 import json
 
@@ -48,11 +48,12 @@ def main():
       if not g.current_user:
          return redirect(url_for('/'))
 
-      return render_template('main.html',
+      return render_template('ach_main.html',
                             title="Jungle Sunday",
                             heading="Jungle Sunday",
                             sub_head="일요일을 맛있게 보내자!",
                             post="글쓰기",
+                            delete="삭제",
                             ) 
     except:
       return redirect(url_for('/'))
@@ -85,7 +86,7 @@ def handle_post():
       db.post.insert_one(post)
       return jsonify({'result': 'success'})
 
-@app.route('/main/post/<poster_id>', methods=['POST'])
+@app.route('/main/post/delete', methods=['POST'])
 def delete_post():
   temp_id_receive = request.form['post_id_give']
   id_receive = ObjectId(temp_id_receive)
@@ -121,14 +122,21 @@ def post():
                           post="게시하기",
                           back="뒤로가기",
                           upload="사진 불러오기",
+                          check="장소 확인",
                           )
 
 #USER_INFO HTML
-@app.route('/user_info')
-def user_info():
+@app.route('/user_info/<poster_id>')
+def user_info(poster_id):
    return render_template('user_info.html',
                           title="사용자 정보",
+                          classroomNum="수강실",
+                          poster_id=poster_id,
                           )
+
+# @app.route('/user_info/<poster_id>', methods=['GET'])
+# def get_user_info(poster_id):
+   
 
 if __name__ == '__main__':  
    app.run('0.0.0.0',port=5001,debug=True)
