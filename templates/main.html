@@ -66,30 +66,36 @@
     function makePost(post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
       let temp_html = /*html*/`<div class="tile is-parent">
                                 <article class="tile is-child box">
-                                  <a href="/user_info">
+                                  <a href="/user_info/${poster_id}">
                                     <img class="profile-image">
-                                    <div>
-                                      <p class="profile-id">name<p>
-                                    </div>
                                   </a>
+                                  <p class="profile-id">
+                                    <a href="/user_info/${poster_id}">
+                                      ${poster_id}
+                                    </a>
+                                  <p>
                                   <p class="subtitle">${post_time}</p>
                                   <figure class="image">
                                     <img src="${image}">
                                   </figure>
                                   <p class="title">${post_title}</p>
                                   <p class="subtitle">${post_content}</p>
-                                  <a herf="#" onclick="likePost('${post_id}')">
+                                  <a href="#" onclick="likePost('${post_id}')">
                                     <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes">${likes}</span>
                                   </a>
-                                  <a herf="#" onclick="dislikePost('${post_id}')">
+                                  <a href="#" onclick="dislikePost('${post_id}')">
                                     <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
                                   </a>
-                                  <div class="buttons delete-button">
+                                  <div class="buttons delete-button" id="delete-${post_id}">
                                     <button class="button is-danger" onclick="deletePost('${post_id}')">삭제</button>
                                   </div>
                                 </article>
                       </div>`;
+      
       $("#post-display").append(temp_html);
+      if (poster_id !== '{{username}}') {
+        $(`#delete-${post_id}`).hide()
+      }
     }
 
     function deletePost(id) {
