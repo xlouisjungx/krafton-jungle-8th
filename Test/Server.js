@@ -26,7 +26,8 @@ const UserSchema = new mongoose.Schema({
     classR: String,
     OS: String,
     ID: String,
-    password: String
+    password: String,
+    place: String
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -43,11 +44,11 @@ app.post("/register", async (req, res) => {
     // 기존 아이디 중복 확인
     const existingUser = await User.findOne({ ID });
     if (existingUser) {
-        return res.status(400).json({ result: "error", message: "이미 가입한 아이디 입니다." });
+        return res.status(400).json({ result: "error", message: "이미 가입된 아이디 입니다." });
     }
 
     // 사용자 정보 저장
-    const newUser = new User({ username, classR, OS, ID, password });
+    const newUser = new User({ username, classR, OS, ID, password, place });
 
     try {
         await newUser.save();
