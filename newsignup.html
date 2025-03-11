@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+    <title>회원가입</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <section class="section">
+            <h2 class="title has-text-centered">회원가입</h2>
+        </section>
+
+        <div class="box">
+            <!-- 이름 -->
+            <div class="field">
+                <label class="label" for="username">이름</label>
+                <div class="control has-icons-left">
+                    <input class="input" type="text" id="username" placeholder="이름을 입력하세요" required>
+                    <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+                </div>
+            </div>
+
+            <!-- 강의실 -->
+            <div class="field">
+                <label class="label" for="classR">강의실</label>
+                <div class="control">
+                    <input class="input" type="text" id="classR" placeholder="배정받은 강의실을 입력하세요" required>
+                </div>
+            </div>
+
+            <!-- 사용 OS -->
+            <div class="field">
+                <label class="label" for="OS">사용 중인 OS</label>
+                <div class="control">
+                    <div class="select">
+                        <select id="OS">
+                            <option value="Windows">Windows</option>
+                            <option value="Mac">Mac</option>
+                            <option value="Linux">Linux</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 장소 -->
+            <div class="field">
+                <label class="label" for="place">장소</label>
+                <div class="control">
+                    <input class="input" type="url" id="place" placeholder="URL을 입력하세요" required>
+                </div>
+            </div>
+
+            <!-- 이메일 -->
+            <div class="field">
+                <label class="label" for="Email">이메일</label>
+                <div class="control has-icons-left">
+                    <input class="input" type="email" id="Email" placeholder="이메일을 입력하세요" required>
+                    <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                </div>
+            </div>
+
+            <!-- 아이디 -->
+            <div class="field">
+                <label class="label" for="ID">아이디</label>
+                <div class="control">
+                    <input class="input" type="text" id="ID" placeholder="아이디를 입력하세요" required>
+                </div>
+            </div>
+
+            <!-- 비밀번호 -->
+            <div class="field">
+                <label class="label" for="password">비밀번호</label>
+                <div class="control">
+                    <input class="input" type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+            </div>
+
+            <!-- 비밀번호 확인 -->
+            <div class="field">
+                <label class="label" for="password2">비밀번호 확인</label>
+                <div class="control">
+                    <input class="input" type="password" id="password2" placeholder="비밀번호를 다시 입력하세요" required>
+                </div>
+            </div>
+
+            <!-- 가입 버튼 -->
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-primary" type="button" onclick="registerUser()">가입</button>
+                </div>
+                <div class="control">
+                    <button class="button is-light" type="button" onclick="cancelRegister()">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function registerUser() {
+            const username = document.getElementById("username").value;
+            const classR = document.getElementById("classR").value;
+            const OS = document.getElementById("OS").value;
+            const place = document.getElementById("place").value;
+            const Email = document.getElementById("Email").value;
+            const ID = document.getElementById("ID").value;
+            const password = document.getElementById("password").value;
+            const password2 = document.getElementById("password2").value;
+
+            if (!username || !classR || !OS || !place || !Email || !ID || !password || !password2) {
+                alert("모든 정보를 입력하세요.");
+                return;
+            }
+
+            if (password !== password2) {
+                alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5001/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, classR, OS, place, Email, ID, password })
+                });
+
+                const result = await response.json();
+
+                if (result.result === "success") {
+                    alert("회원가입이 완료되었습니다!");
+                    window.location.href = "login.html";  // 로그인 페이지로 이동
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error("회원가입 중 오류 발생:", error);
+                alert("회원가입 중 문제가 발생했습니다. 다시 시도해주세요.");
+            }
+        }
+
+        function cancelRegister() {
+            if (confirm("회원가입을 취소하시겠습니까?")) {
+                window.location.href = "index.html";  // 메인 페이지 또는 다른 페이지로 이동
+            }
+        }
+    </script>
+</body>
+
+</html>
