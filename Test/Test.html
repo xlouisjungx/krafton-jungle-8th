@@ -56,7 +56,7 @@
         <label for="password">PW:</label>
         <input type="password" id="password" name="password" required>
         <label for="password2">PW 확인:</label>
-        <input type="password2" id="password2" name="password2" required>
+        <input type="password" id="password2" name="password2" required>
 
         <button onclick="registerUser()">회원가입</button>
     </div>
@@ -67,18 +67,27 @@
             const classR = document.getElementById("classR").value;
             const ID = document.getElementById("ID").value;
             const password = document.getElementById("password").value;
+            const password2 = document.getElementById("password2").value;
 
             if (!username || !password) {
                 alert("아이디와 비밀번호를 입력하세요.");
                 return;
             }
 
-            // 비밀번호 재확인
+            if (!username || !ID || !password || !classR) {
+                alert("모든 정보를 입력하세요.");
+                return;
+            }
+
+            if (password !== password2) {
+                alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+                return;
+            }
 
             const response = await fetch("http://localhost:5001/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, ID, classR, password })
             });
 
             const result = await response.json();

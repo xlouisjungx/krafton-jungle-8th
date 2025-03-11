@@ -21,28 +21,30 @@ app.use(bodyParser.json());
 // User 스키마 생성
 const UserSchema = new mongoose.Schema({
     username: String,
-    password: String,
+    classR: String,
+    ID: String,
+    password: String
 });
 
 const User = mongoose.model("User", UserSchema);
 
 // 회원가입 API
 app.post("/register", async (req, res) => {
-    const { username, password } = req.body;
+    const { username, classR, ID, password } = req.body;
 
     // 데이터 유효성 검사
-    if (!username || !password) {
+    if (!username || !classR || !ID || !password) {
         return res.status(400).json({ result: "error", message: "아이디와 비밀번호를 입력하세요." });
     }
 
     // 기존 아이디 중복 확인
-    const existingUser = await User.findOne({ ID });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
         return res.status(400).json({ result: "error", message: "이미 존재하는 아이디입니다." });
     }
 
     // 사용자 정보 저장
-    const newUser = new User({ username, password });
+    const newUser = new User({ username, classR, ID, password });
 
     try {
         await newUser.save();
