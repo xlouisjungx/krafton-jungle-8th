@@ -41,6 +41,7 @@
   <!-- JS Function -->
   <script>
     $(document).ready(function () {
+        const token = localStorage.getItem("jwt_token");
         $("#post-display").html("");
         showPosts();
     });

@@ -1,15 +1,23 @@
 from bson import ObjectId
+import json
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, g
 from flask.json.provider import JSONProvider
 from flask_jwt_extended import JWTManager, verify_jwt_in_request, jwt_required, get_jwt_identity
-app = Flask(__name__)
+from flask_cors import CORS 
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from datetime import datetime, timedelta
+
 
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client.jungle_sunday
 
-import json
+app = Flask(__name__)
+
+# JWT 비밀키 설정
+JWT_SECRET = 'Sunday'
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -38,6 +46,10 @@ def load_current_user():
 def inject_user():
    return dict(username = g.current_user)
 
+#GENERAL ROUTE
+@app.route('/')
+def original():
+   i
 
 #MAIN HTML
 @app.route('/main')
@@ -136,7 +148,106 @@ def user_info(poster_id):
 
 # @app.route('/user_info/<poster_id>', methods=['GET'])
 # def get_user_info(poster_id):
-   
+
+#LOGIN
+# 로그인 부분 (JWT 할당)
+@app.route('/login')
+def login():
+   return render_template('login.html')
+
+@app.route('/login/signIn', methods=["POST"])
+def login_user():
+    Email_receive = request.form['Email_give']
+    password_receive = request.form['password_give']
+
+    if not Email_receive or not password_receive:
+        return jsonify({"result": "error", "message": "이메일과 비밀번호를 입력하세요."})
+
+    # 사용자 조회
+    user = db.users.find_one({"email": Email_receive})
+    print(user)
+    if not user:
+        return jsonify({"result": "error", "message": "사용자가 존재하지 않습니다. 회원가입 해주세요."})
+
+    # 비밀번호 검증
+    if not check_password_hash(user['password'], password_receive):
+        return jsonify({"result": "error", "message": "비밀번호가 틀렸습니다."})
+
+    # JWT 생성
+    payload = {
+        "user_id": str(user["_id"]),
+        "exp": datetime.now() + timedelta(hours=1)  # 토큰 만료 시간 설정
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+    return jsonify({"result": "success", "token": token})
+
+# 보호된 API 예시 (JWT 인증)
+@app.route("/protected", methods=["GET"])
+def protected():
+    token = request.headers.get("Authorization")
+    
+    if not token:
+        return jsonify({"result": "error", "message": "토큰이 필요합니다."})
+    
+    try:
+        token = token.split(" ")[1]  # "Bearer <token>" 형식에서 토큰만 추출
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user_id = payload["user_id"]
+        return jsonify({"result": "success", "message": "인증된 사용자 ID: {user_id}"})
+    except jwt.ExpiredSignatureError:
+        return jsonify({"result": "error", "message": "토큰이 만료되었습니다."})
+    except jwt.InvalidTokenError:
+        return jsonify({"result": "error", "message": "유효하지 않은 토큰입니다."})
+
+# 회원가입 API
+@app.route("/register")
+def register():
+   return render_template('register.html')
+
+@app.route("/register", methods=["POST"])
+def register_user():
+    # 데이터 유효성 검사
+    username_receive = request.form['username_give']
+    classR_receive = request.form['classR_give']
+    OS_receive = request.form['OS_give']
+    Email_receive = request.form['Email_give']
+    ID_receive = request.form['ID_give']
+    password_receive = request.form['password_give']
+    place_receive = request.form['place_give']
+
+    if not username_receive or not classR_receive or not ID_receive or not password_receive:
+        print('a')
+        return jsonify({"result": "error", "message": "아이디와 비밀번호를 입력하세요."})
+
+    # 기존 아이디 중복 확인
+    existing_user = db.users.find_one({"ID": ID_receive})
+    if existing_user:
+        print('b')
+        return jsonify({"result": "error", "message": "이미 가입된 아이디 입니다."})
+
+    # 비밀번호 해싱 (보안을 위해)
+    hashed_password = generate_password_hash(password_receive, method="pbkdf2:sha256")
+
+    # 사용자 정보 저장
+    user = {
+        "username": username_receive,
+        "classR": classR_receive,
+        "OS": OS_receive,
+        "email": Email_receive,
+        "ID": ID_receive,
+        "password": hashed_password,
+        "place": place_receive
+    }
+
+    try:
+        print('save')
+        db.users.insert_one(user)
+        return jsonify({"result": "success", "message": "회원가입 완료! 로그인 페이지로 이동합니다."})
+    except Exception as e:
+        return jsonify({"result": "error", "message": "회원가입 중 오류가 발생했습니다: {str(e)}"})
+
+
 
 if __name__ == '__main__':  
    app.run('0.0.0.0',port=5001,debug=True)
