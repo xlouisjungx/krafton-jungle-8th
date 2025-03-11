@@ -20,53 +20,99 @@
     <!-- 아이콘 -->
     <title>회원가입</title>
     <style>
-        .jemok {
-            width: 700px;
-            margin: 50px auto;
-            padding: 0 180px;
+        .textset {
+            margin: 0 20px;
+            padding-right: 100px;
         }
 
-        input {
-            width: 90%;
-            padding: 8px;
-            margin: 5px 0;
-        }
-
-        button:hover {
-            background-color: #218838;
+        .submit {
+            margin-top: 50px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="jemok">
-            <h2>회원가입</h2>
-        </div>
 
-        <div>
-            <label for="username">이름:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="classR">강의실:</label>
-            <input type="text" id="classR" name="classR" required>
-            <br>
-            <label for="classR">사용OS:</label>
-            <input type="text" id="OS" name="OS" required>
-            <br>
-            <label for="ID">ID:</label>
-            <input type="text" id="ID" name="ID" required>
-            <br>
-            <label for="password">PW:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <label for="password2">PW 확인:</label>
-            <input type="password" id="password2" name="password2" required>
-        </div>
+        <section class="section">
+            <div class="has-text-left">
+                <h2 class="title">회원가입</h2>
+            </div>
+        </section>
+        
+        <!-- 회원가입 텍스트 -->
+        <div class="textset">
+            <!-- 이름 -->
+            <div class="field">
+                <label for="username" class="label">이름</label>
+                <div class="control has-icons-left has-icons-right">
+                    <input id="username" name="username" class="input " type="text" placeholder="이름" value="" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    
+                </div>
+            </div>
 
-        <div class="buttons">
-            <button class="button is-primary" onclick="registerUser()">회원가입</button>
-            <button class="button is-danger">취소</button>
+            <!-- 강의실 -->
+            <div class="field">
+                <label for="classR" class="label">강의실</label>
+                <div class="control">
+                    <input id="classR" name="classR" class="input" type="text" placeholder="배정받은 강의실을 입력해주세요" required>
+                </div>
+            </div>
+
+            <!-- 사용OS -->
+            <div class="field">
+                <label for="classR" class="label">사용중인 OS</label>
+                <div class="control">
+                    <div class="select">
+                        <select>
+                            <option>Window</option>
+                            <option>MAC</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이메일 -->
+            <div class="field">
+                <label for="Email" class="label">Email</label>
+                <div class="control has-icons-left has-icons-right">
+                    <input class="input" id="Email" name="Email"  type="email" placeholder="이메일을 입력해주세요" value="" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    
+                </div>
+            </div>
+            <!-- 패스워드, 확인 -->
+            <div class="field">
+                <label for="password" class="label">패스워드</label>
+                <div class="control">
+                    <input class="input" id="password" name="password" type="password" placeholder="" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="password2" class="label">패스워드 확인</label>
+                <div class="control">
+                    <input class="input" id="password2" name="password2" type="password" placeholder="" required>
+                </div>
+            </div>
+
+
+            <!-- 가입 버튼 -->
+            <div class="submit">
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-primary">가입</button>
+                    </div>
+                    <div class="control">
+                        <button class="button is-link is-light">취소</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -75,11 +121,17 @@
             const username = document.getElementById("username").value;
             const classR = document.getElementById("classR").value;
             const OS = document.getElementById("OS").value;
+
+            //장소 정보 저장되는지 테스트  
+            const place = document.getElementById("place").value;
+
+
+            const Email = document.getElementById("Email").value;
             const ID = document.getElementById("ID").value;
             const password = document.getElementById("password").value;
             const password2 = document.getElementById("password2").value;
 
-            if (!username || !classR || !OS || !ID || !password || !password2) {
+            if (!username || !classR || !OS || !Email || !ID || !password || !password2) {
                 alert("모든 정보를 입력하세요.");
                 return;
             }
@@ -92,10 +144,15 @@
             const response = await fetch("http://localhost:5001/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, classR, OS, ID, password, password2 })
+                body: JSON.stringify({ username, classR, OS, place, Email, ID, password, password2 })
             });
 
             const result = await response.json();
+            //alert("회원가입 완료! 로그인 페이지로 이동합니다.");
+            
+            if(result.result === "success") {
+                window.location.href = "login.html";  // 로그인 페이지로 이동
+            }
             alert(result.message);
         }
     </script>
