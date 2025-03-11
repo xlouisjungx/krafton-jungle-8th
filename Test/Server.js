@@ -48,7 +48,7 @@ app.post("/register", async (req, res) => {
     }
 
     // 사용자 정보 저장
-    const newUser = new User({ username, classR, OS, ID, password, place });
+    const newUser = new User({ username, classR, OS, ID, password, place});
 
     try {
         await newUser.save();
