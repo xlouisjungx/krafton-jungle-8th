@@ -71,6 +71,11 @@
     .green{
       color: red;
     }
+
+    .trash
+    {
+      margin-top: 10px;
+    }
   </style>
 
   <!-- JS Function -->
@@ -220,7 +225,7 @@
               </div>
 
               <!-- 삭제 아이콘 -->
-              <div>
+              <div class="trash">
                 <a class="green" href="#"><i class="fa-solid fa-trash"></i></a>
               </div>
 
@@ -241,14 +246,14 @@
               <br>
               <!-- 아이콘 -->
               <div class="icongroup">
-                <!-- 댓글 아이콘 -->
-                <span class="icon"><i class="fa-solid fa-comment"></i></span>
+                <!-- 댓글 아이콘 --> 
+                <span class="icon"><i class="fa-solid fa-comment fa-lg"></i></span>
                 <!-- 좋아요 아이콘 -->
-                <span class="icon iconleft"><i class="fas fa-thumbs-up"></i>
+                <span class="icon iconleft"><i class="fa-solid fa-thumbs-up fa-lg"></i>
                 </span>
                 <span class="movie-likes">${likes}</span>
                 <!-- 싫어요 아이콘 -->
-                <span class="icon iconleft"><i class="fas fa-thumbs-down"></i>
+                <span class="icon iconleft"><i class="fas fa-thumbs-down fa-lg"></i>
                 </span>
                 <span class="movie-likes">${likes}</span>
               </div>

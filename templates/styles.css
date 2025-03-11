@@ -1,0 +1,27 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 20px;
+}
+
+.comment-section {
+    margin-top: 10px;
+}
+
+.comment-input {
+    width: 70%;
+    padding: 5px;
+}
+
+.submit-comment {
+    padding: 5px;
+}
+
+.comments-list {
+    margin-top: 10px;
+}
