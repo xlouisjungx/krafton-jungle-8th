@@ -53,6 +53,7 @@ def main():
                             heading="Jungle Sunday",
                             sub_head="일요일을 맛있게 보내자!",
                             post="글쓰기",
+                            delete="삭제",
                             ) 
     except:
       return redirect(url_for('/'))
@@ -121,6 +122,7 @@ def post():
                           post="게시하기",
                           back="뒤로가기",
                           upload="사진 불러오기",
+                          check="장소 확인",
                           )
 
 #USER_INFO HTML

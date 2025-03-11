@@ -34,10 +34,14 @@
       justify-content: center;
     }
 
+    .place-link {
+      display: flex;
+      justify-content: center;
+      margin: 0 5%;
+    }
     .post-field {
       margin: 1% 5%;
     }
-
     .post-content {
       margin: 10px 0;
     }
@@ -113,6 +117,13 @@
     <button class="button is-link" onclick="postPost()">{{post}}</button>
   </div>
 
+  <div class="place-link">
+    <input class="input is-normal" id="post-link" type="text" placeholder="link"/>
+    <button class="button is-info">{{check}}</button>
+  </div>
+
+  <div id="place-name">
+  </div>
 
   <div class="file is-boxed img-field">
     <label class="file-label">
@@ -131,8 +142,8 @@
   </div>
 
   <div class="post-field">
-    <input class="input is-normal" id="post-title" type="text" placeholder="title" />
-
+    <input class="input is-normal" id="post-title" type="text" placeholder="title"/>
+    
     <div class="field post-content">
       <div class="control">
         <textarea class="textarea" id="post-content" placeholder="content"></textarea>
