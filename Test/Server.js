@@ -1,5 +1,9 @@
 // MongoDB에 연결하는 서버
 
+//db.users.find().sort({ _id: -1 }).limit(5).pretty() -> 최근 5개 데이터 보기
+
+
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -53,7 +57,7 @@ app.post("/register", async (req, res) => {
     try {
         await newUser.save();
         res.json({ result: "success", message: "회원가입이 완료되었습니다." });
-    } catch (error) {
+        } catch (error) {
         res.status(500).json({ result: "error", message: "회원가입 중 오류가 발생했습니다." });
     }
 });

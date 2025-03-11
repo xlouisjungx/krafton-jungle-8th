@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <style>
+        .login-box {
+            width: 700px;
+            margin: 100px auto;
+            padding: 50px;
+        }
+        .jemok{
+            width: 700px;
+            margin: 50px auto;
+            padding: 0 180px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jemok is-size-1 has-text-centered">
+            <h1>Jungle Sunday</h1>
+        </div>
+        <div class="login-box">
+            <form class="box">
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input class="input" type="email" placeholder="jungle@example.com" />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" placeholder="********" />
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button onclick="warning()" class="button is-primary">로그인</button>
+                    <button type="button" onclick= "location.href='Test.html'" class="button is-info">회원가입</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        function warning(){
+            alert("아이디 또는 비밀번호가 잘못되었습니다")
+        }
+    </script>
+
+</body>
+
+</html>

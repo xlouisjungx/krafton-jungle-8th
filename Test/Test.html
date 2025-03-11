@@ -56,6 +56,9 @@
         <label for="ID">ID:</label>
         <input type="text" id="ID" name="ID" required>
 
+        <label for="place">place:</label>
+        <input type="url" id="place" name="place" required>
+
         <label for="password">PW:</label>
         <input type="password" id="password" name="password" required>
         <label for="password2">PW 확인:</label>
@@ -70,6 +73,10 @@
             const classR = document.getElementById("classR").value;
             const OS = document.getElementById("OS").value;
             const ID = document.getElementById("ID").value;
+
+            //장소 정보 저장되는지 테스트  
+            const place = document.getElementById("place").value;
+
             const password = document.getElementById("password").value;
             const password2 = document.getElementById("password2").value;
 
@@ -86,10 +93,14 @@
             const response = await fetch("http://localhost:5001/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, classR, OS, ID, password, password2 })
+                body: JSON.stringify({ username, classR, OS, ID, password, password2, place })
             });
 
             const result = await response.json();
+            alert("회원가입 완료! 로그인 페이지로 이동합니다.");
+
+            window.location.href = "login.html";  // 로그인 페이지로 이동
+    
             alert(result.message);
         }
     </script>
