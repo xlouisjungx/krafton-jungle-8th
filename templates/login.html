@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>login</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
     <style>
         .login-box {
@@ -17,13 +17,17 @@
             margin: 50px auto;
             padding: 0 180px;
         }
+        .fontcolor{
+            color:white;
+            font-size: large;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="jemok is-size-1 has-text-centered">
-            <h1>Jungle Sunday</h1>
+            <h1>{{heading}}</h1>
         </div>
         <div class="login-box">
             <form class="box">
@@ -42,8 +46,8 @@
                 </div>
 
                 <div class="buttons">
-                    <button onclick="warning()" class="button is-primary">로그인</button>
-                    <button class="button is-info">회원가입</button>
+                    <button onclick="warning()" class="button fontcolor is-primary">로그인</button>
+                    <button class="button fontcolor is-info">회원가입</button>
                 </div>
             </form>
         </div>
