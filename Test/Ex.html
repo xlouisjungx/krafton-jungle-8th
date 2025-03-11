@@ -1,46 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ex 페이지</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            background-color: #444;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        nav a:hover {
+            color: #f39c12;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+        }
+
+        .content {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="content">
-        <h1>안녕하세요, 인증된 사용자입니다!</h1>
+    <!-- Header Section -->
+    <header>
+        <h1>Welcome to My Simple Website</h1>
+    </header>
+
+    <!-- Navigation Section -->
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+    </nav>
+
+    <!-- Main Content Section -->
+    <div class="container">
+        <div class="content">
+            <h2>About Us</h2>
+            <p>This is a simple website created using HTML and CSS. It features a basic layout with a header, navigation, and content section. The website is fully responsive, adjusting to different screen sizes.</p>
+            <p>Feel free to explore and modify this template for your own projects!</p>
+        </div>
     </div>
 
-    <script>
-        // 페이지 로드 시, JWT 토큰이 로컬 스토리지에 있는지 확인
-        const token = localStorage.getItem("jwt_token");
-
-        if (!token) {
-            alert("인증되지 않은 사용자입니다. 로그인 후 다시 시도해주세요.");
-            window.location.href = "index.html"; // 로그인 페이지로 리디렉션
-        }
-
-        // 서버에 토큰을 보내서 유효한지 확인하는 API 호출
-        fetch("http://localhost:5001/protected", {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token,
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === "error") {
-                alert("인증이 실패했습니다.");
-                window.location.href = "index.html"; // 로그인 페이지로 리디렉션
-            }
-        })
-        .catch(error => {
-            console.error("인증 오류:", error);
-            alert("인증 오류가 발생했습니다.");
-            window.location.href = "index.html"; // 로그인 페이지로 리디렉션
-        });
-    </script>
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 Simple Website. All Rights Reserved.</p>
+    </footer>
 
 </body>
 

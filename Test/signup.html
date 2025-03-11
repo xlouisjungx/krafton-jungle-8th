@@ -43,31 +43,32 @@
 <body>
     <div class="container">
         <h2>회원가입</h2>
-        
-        <label for="username">이름:</label>
-        <input type="text" id="username" name="username" required>
+        <form action="/register" method="POST">
+            <label for="username">이름:</label>
+            <input type="text" id="username" name="username" required>
 
-        <label for="classR">강의실: (배정받은 강의실을 작성해주세요.)</label>
-        <input type="text" id="classR" name="classR" required>
+            <label for="classR">강의실: (배정받은 강의실을 작성해주세요.)</label>
+            <input type="text" id="classR" name="classR" required>
 
-        <label for="classR">사용OS: (예: Window, Mac, Linux...)</label>
-        <input type="text" id="OS" name="OS" required>
+            <label for="classR">사용OS: (예: Window, Mac, Linux...)</label>
+            <input type="text" id="OS" name="OS" required>
 
-        <label for="place">place:</label>
-        <input type="url" id="place" name="place" required>
+            <label for="place">place:</label>
+            <input type="url" id="place" name="place" required>
 
-        <label for="Email">Email:</label>
-        <input type="email" id="Email" name="Email" required>
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" required>
 
-        <label for="ID">ID:</label>
-        <input type="text" id="ID" name="ID" required>
+            <label for="ID">ID:</label>
+            <input type="text" id="ID" name="ID" required>
 
-        <label for="password">PW:</label>
-        <input type="password" id="password" name="password" required>
-        <label for="password2">PW 확인:</label>
-        <input type="password" id="password2" name="password2" required>
+            <label for="password">PW:</label>
+            <input type="password" id="password" name="password" required>
+            <label for="password2">PW 확인:</label>
+            <input type="password" id="password2" name="password2" required>
 
-        <button onclick="registerUser()">회원가입</button>
+            <button onclick="registerUser()">회원가입</button>
+        </form>
     </div>
 
     <script>

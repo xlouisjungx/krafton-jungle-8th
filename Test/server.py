@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/register": {"origins": "*"}})
+CORS(app, resources={r"/login": {"origins": "*"}, r"/register": {"origins": "*"}})
 
 # MongoDB 연결 설정
 app.config["MONGO_URI"] = "mongodb://localhost:27017/jungle_sunday"
