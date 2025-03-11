@@ -53,11 +53,14 @@
         <label for="classR">사용OS: (예: Window, Mac, Linux...)</label>
         <input type="text" id="OS" name="OS" required>
 
-        <label for="ID">ID:</label>
-        <input type="text" id="ID" name="ID" required>
-
         <label for="place">place:</label>
         <input type="url" id="place" name="place" required>
+
+        <label for="Email">Email:</label>
+        <input type="email" id="Email" name="Email" required>
+
+        <label for="ID">ID:</label>
+        <input type="text" id="ID" name="ID" required>
 
         <label for="password">PW:</label>
         <input type="password" id="password" name="password" required>
@@ -72,15 +75,17 @@
             const username = document.getElementById("username").value;
             const classR = document.getElementById("classR").value;
             const OS = document.getElementById("OS").value;
-            const ID = document.getElementById("ID").value;
 
             //장소 정보 저장되는지 테스트  
             const place = document.getElementById("place").value;
 
+
+            const Email = document.getElementById("Email").value;
+            const ID = document.getElementById("ID").value;
             const password = document.getElementById("password").value;
             const password2 = document.getElementById("password2").value;
 
-            if (!username || !classR || !OS || !ID || !password || !password2) {
+            if (!username || !classR || !OS || !Email || !ID || !password || !password2) {
                 alert("모든 정보를 입력하세요.");
                 return;
             }
@@ -93,14 +98,15 @@
             const response = await fetch("http://localhost:5001/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, classR, OS, ID, password, password2, place })
+                body: JSON.stringify({ username, classR, OS, place, Email, ID, password, password2 })
             });
 
             const result = await response.json();
-            alert("회원가입 완료! 로그인 페이지로 이동합니다.");
-
-            window.location.href = "login.html";  // 로그인 페이지로 이동
-    
+            //alert("회원가입 완료! 로그인 페이지로 이동합니다.");
+            
+            if(result.result === "success") {
+                window.location.href = "login.html";  // 로그인 페이지로 이동
+            }
             alert(result.message);
         }
     </script>
