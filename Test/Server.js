@@ -34,7 +34,7 @@ const User = mongoose.model("User", UserSchema);
 
 // 회원가입 API
 app.post("/register", async (req, res) => {
-    const { username, classR, OS, ID, password } = req.body;
+    const { username, classR, OS, ID, password, place } = req.body;
 
     // 데이터 유효성 검사
     if (!username || !classR || !ID || !password) {
