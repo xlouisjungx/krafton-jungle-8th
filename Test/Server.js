@@ -1,3 +1,5 @@
+// MongoDB에 연결하는 서버
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -22,6 +24,7 @@ app.use(bodyParser.json());
 const UserSchema = new mongoose.Schema({
     username: String,
     classR: String,
+    OS: String,
     ID: String,
     password: String
 });
@@ -30,7 +33,7 @@ const User = mongoose.model("User", UserSchema);
 
 // 회원가입 API
 app.post("/register", async (req, res) => {
-    const { username, classR, ID, password } = req.body;
+    const { username, classR, OS, ID, password } = req.body;
 
     // 데이터 유효성 검사
     if (!username || !classR || !ID || !password) {
@@ -38,13 +41,13 @@ app.post("/register", async (req, res) => {
     }
 
     // 기존 아이디 중복 확인
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ ID });
     if (existingUser) {
-        return res.status(400).json({ result: "error", message: "이미 존재하는 아이디입니다." });
+        return res.status(400).json({ result: "error", message: "이미 가입한 아이디 입니다." });
     }
 
     // 사용자 정보 저장
-    const newUser = new User({ username, classR, ID, password });
+    const newUser = new User({ username, classR, OS, ID, password });
 
     try {
         await newUser.save();
