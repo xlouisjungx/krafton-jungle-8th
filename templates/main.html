@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bulma CSS 링크 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+  <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
+  <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+
+  <!-- 아이콘 -->
+  <title>main</title>
+
+  <style>
+    .post-button {
+      display: flex;
+      justify-content: right;
+      margin-right: 5%;
+    }
+
+    .like-buttons {
+      margin: auto;
+    }
+
+    .profile-image {
+      width: 100px;
+      height: 100px;
+    }
+
+    .profile-id {
+      font-size: 30px;
+    }
+
+    .delete-button {
+      margin-top: 20px;
+    }
+
+    /* 새로 추가한 css */
+    .buttonpost {
+      display: flex;
+      justify-content: right;
+
+    }
+
+    .side {
+      padding: 0 150px;
+    }
+
+    .icongroup {
+      display: flex;
+      justify-content: right;
+    }
+
+    .iconleft {
+      padding-left: 40px;
+    }
+
+    .cardmargin {
+      margin-bottom: 30px;
+    }
+
+    .red {
+      color: red;
+    }
+
+    .trash {
+      margin-top: 10px;
+    }
+
+    /* 로고 스타일 */
+    .logo {
+      display: flex;
+      justify-content: left;
+      margin: 10px;
+    }
+
+    .logo img {
+      max-width: 150px;
+      /* 로고 크기 조정 */
+      height: auto;
+    }
+
+    /* 슬라이드 css */
+
+    body {
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    swiper-container {
+      width: 100%;
+      height: 400px;
+    }
+
+    swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+
+    /* 댓글 */
+    .comment-toggle {
+      cursor: pointer;
+      color: gray;
+      text-decoration: none;
+    }
+
+    .comment-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .comment-section {
+      margin-top: 10px;
+      display: none;
+      /* 기본적으로 숨김 */
+    }
+
+    .comments-list {
+      margin-top: 10px;
+    }
+
+    /* 댓글 */
+  </style>
+
+  <!-- JS Function -->
+  <script>
+    $(document).ready(function () {
+      $("#post-display").html("");
+      showPosts();
+    });
+
+    function showPosts() {
+      $.ajax({
+        type: "GET",
+        url: "/main/post",
+        data: {},
+        success: function (response) {
+          let posts = response["posts"];
+          for (let i = 0; i < posts.length; i++) {
+            makePost(posts[i]["_id"], posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["dislike"], posts[i]["post_time"])
+          }
+
+          if (posts.length === 0) {
+            makePost('', '', '게시글 없음', '', '', '', '', '')
+          }
+        }
+      })
+    }
+
+    function makePost(post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
+      let temp_html = /*html*/`<div class="tile is-parent">
+                                <article class="tile is-child box">
+                                  <a href="/user_info">
+                                    <img class="profile-image">
+                                    <div>
+                                      <p class="profile-id">name<p>
+                                    </div>
+                                  </a>
+                                  <p class="subtitle">${post_time}</p>
+                                  <figure class="image">
+                                    <img src="${image}">
+                                  </figure>
+                                  <p class="title">${post_title}</p>
+                                  <p class="subtitle">${post_content}</p>
+                                  <a herf="#" onclick="likePost('${post_id}')">
+                                    <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes">${likes}</span>
+                                  </a>
+                                  <a herf="#" onclick="dislikePost('${post_id}')">
+                                    <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
+                                  </a>
+                                  <div class="buttons delete-button">
+                                    <button class="button is-danger" onclick="deletePost('${post_id}')">삭제</button>
+                                  </div>
+                                </article>
+                      </div>`;
+      $("#post-display").append(temp_html);
+    }
+
+    function deletePost(id) {
+      $.ajax({
+        type: "POST",
+        url: "/main/post/delete",
+        data: { post_id_give: id },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('삭제 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('삭제 실패ㅠㅠ')
+          }
+        }
+      });
+    }
+
+    function likePost(id) {
+      $.ajax({
+        type: "POST",
+        url: "/main/post/like",
+        data: { post_id_give: id },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('맛있어요 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('맛있어요 실패ㅠㅠ')
+          }
+        }
+      });
+    }
+
+    function dislikePost(id) {
+      $.ajax({
+        type: "POST",
+        url: "/main/post/dislike",
+        data: { post_id_give: id },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('맛없어요 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('맛없어요 실패ㅠㅠ')
+          }
+        }
+      });
+    }
+
+    // 슬라이드js
+    const swiper = new Swiper('.swiper', {
+      // Optional parameters
+      direction: 'vertical',
+      loop: true,
+
+      // If we need pagination
+      pagination: {
+        el: '.swiper-pagination',
+      },
+
+      // Navigation arrows
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+
+      // And if we need scrollbar
+      scrollbar: {
+        el: '.swiper-scrollbar',
+      },
+    });
+    // 슬라이드js
+
+   
+
+  </script>
+
+
+</head>
+
+<body>
+  <div class="container">
+    
+<!-- 헤더 -->
+    <div class="top">
+
+      <div class="dropdown is-active">
+        <div class="dropdown-trigger">
+          <button class="button" aria-haspopup="true" aria-controls="dropdown-menu2">
+            <span>Content</span>
+            <span class="icon is-small">
+              <i class="fas fa-angle-down" aria-hidden="true"></i>
+            </span>
+          </button>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+          <div class="dropdown-content">
+            <div class="dropdown-item">
+              <p>
+                You can insert <strong>any type of content</strong> within the
+                dropdown menu.
+              </p>
+            </div>
+            <hr class="dropdown-divider" />
+            <div class="dropdown-item">
+              <p>You simply need to use a <code>&lt;div&gt;</code> instead.</p>
+            </div>
+            <hr class="dropdown-divider" />
+            <a href="#" class="dropdown-item"> This is a link </a>
+          </div>
+        </div>
+      </div>
+
+
+      <section class="section side">
+        <div class="logo">
+          <img src="Jungle Sunday.png" alt="로고">
+        </div>
+      </section>
+      <div class="up-button">
+        <a href="/user_info/{{userid}}">
+          <button class="button is-info">내 정보</button>
+        </a>
+        <button id="logout-button" class="button is-danger" onclick="logout()">로그아웃</button>
+      </div>
+    </div>
+
+
+    <!-- 포스트 버튼 -->
+    <div class="side">
+      <div class="buttonpost">
+        <a href="/post">
+          <button class="button is-success is-light">{{post}}</button>
+        </a>
+      </div>
+
+      <div id="post-display">
+      </div>
+
+      <!-- 카드 -->
+      <div class="cardmargin">
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
+                </figure>
+              </div>
+              <!-- 프로필 -->
+              <div class="media-content">
+                <p class="title is-4">John Smith</p>
+                <p class="subtitle is-6">@johnsmith</p>
+              </div>
+
+              <!-- 삭제 아이콘 -->
+              <div class="trash">
+                <a class="red" href="#"><i class="fa-solid fa-trash"></i></a>
+              </div>
+            </div>
+
+            <!-- 원래 이미지 부분 -->
+            <!-- <div class="card-image"> -->
+            <!-- <figure class="image is-4by3"> -->
+            <!-- <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="Placeholder image" /> -->
+            <!-- </figure> -->
+            <!-- </div> -->
+
+            <!-- 슬라이드 -->
+            <swiper-container class="mySwiper" pagination="true">
+              <swiper-slide>Slide 1</swiper-slide>
+              <swiper-slide>Slide 2</swiper-slide>
+              <swiper-slide>Slide 3</swiper-slide>
+            </swiper-container>
+
+
+            <!-- 카드 하단 제목 리뷰 -->
+            <div class="content">
+              <h1>jemok</h1>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec
+              iaculis mauris.
+              <br />
+              <a href="#">식당 주소</a>
+              <br>
+              <br>
+              <!-- 아이콘 -->
+              <div class="icongroup">
+
+                <!-- 좋아요 아이콘 -->
+                <span class="icon iconleft"><i class="fa-solid fa-thumbs-up fa-lg"></i>
+                </span>
+                <span class="movie-likes">${likes}</span>
+                <!-- 싫어요 아이콘 -->
+                <span class="icon iconleft"><i class="fas fa-thumbs-down fa-lg"></i>
+                </span>
+                <span class="movie-likes">${dislikes}</span>
+              </div>
+
+            </div>
+            <hr>
+
+
+            <!-- 댓글 -->
+            <div class="post">
+              <p class="comment-toggle">댓글 달기..</p>
+              <div class="comment-section">
+                <article class="media">
+                  <figure class="media-left">
+                    <p class="image is-64x64">
+                      <img src="https://bulma.io/assets/images/placeholders/128x128.png" alt="Profile Image" />
+                    </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="field">
+                      <p class="control">
+                        <textarea class="textarea" placeholder="댓글을 입력하세요..."></textarea>
+                      </p>
+                    </div>
+                    <nav class="level">
+                      <div class="level-left">
+                        <div class="level-item">
+                          <button class="button is-info comment-button">전송</button>
+                        </div>
+                      </div>
+                      
+                    </nav>
+                  </div>
+                </article>
+                <div class="comments-list"></div>
+              </div>
+            </div>
+
+
+            <!-- 댓글 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<script>
+  // 댓글 달기 버튼 클릭 이벤트
+  document.querySelector('.comment-toggle').addEventListener('click', function() {
+      const commentSection = document.querySelector('.comment-section');
+      // Toggle display
+      if (commentSection.style.display === 'none' || commentSection.style.display === '') {
+        commentSection.style.display = 'block'; // 댓글 입력란 보이기
+      } else {
+        commentSection.style.display = 'none'; // 댓글 입력란 숨기기
+      }
+    });
+  
+    // 전송 버튼 클릭 이벤트
+    document.querySelector('.comment-button').addEventListener('click', function() {
+      const commentInput = document.querySelector('.textarea');
+      const commentsList = document.querySelector('.comments-list');
+  
+      // 댓글 입력이 비어 있지 않은 경우
+      if (commentInput.value.trim() !== '') {
+        // 새로운 댓글 생성
+        const newComment = document.createElement('div');
+        newComment.textContent = commentInput.value;
+        commentsList.appendChild(newComment);
+        commentInput.value = ''; // 입력 필드 초기화
+      } else {
+        alert('댓글을 입력하세요!');
+      }
+    });
+  
+    // Enter 키로 전송 기능
+    document.querySelector('.textarea').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // 기본 Enter 동작 방지
+        document.querySelector('.comment-button').click(); // 전송 버튼 클릭
+      }
+    });
+    </script>
+  
+
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
+</body>
+
+</html>
