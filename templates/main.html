@@ -145,9 +145,6 @@
     ) {
       let temp_html = /*html*/`<div id="post-${post_id}" class="tile is-parent">
                                 <article class="tile is-child box">
-                                  <a href="/user_info/${poster_id}">
-                                    <img class="profile-image">
-                                  </a>
                                   <p class="profile-id">
                                     <a href="/user_info/${poster_id}">
                                       ${real_user_name}
@@ -179,11 +176,6 @@
                                   <div id="reply-post-${post_id}" class="post" style="display: none;">
                                     <div class="comment-section">
                                       <article class="media">
-                                        <figure class="media-left">
-                                          <p class="image is-64x64">
-                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" alt="Profile Image" />
-                                          </p>
-                                        </figure>
                                         <div class="media-content">
                                           <div class="field">
                                             <p class="control">
@@ -193,7 +185,7 @@
                                           <nav class="level">
                                             <div class="level-left">
                                               <div class="level-item">
-                                                <button class="button is-info comment-button" onclick="createReply('${post_id}')">전송</button>
+                                                <button class="button is-info comment-button" onclick="createReply('${post_id}')">{{transmit_name}}</button>
                                               </div>
                                             </div>
                                             
@@ -303,9 +295,6 @@
     function makeReplySession(post_id, reply_id, replier_name, replier_id, reply_content, reply_time) {
       let temp_html = /*html*/`<div class="reply-box">
                                   <div>
-                                    <a href="/user_info/${replier_id}">
-                                      <img class="reply-profile-image">
-                                    </a>
                                   </div>
                                   <div class="reply-content-box">
                                     <p>
@@ -323,7 +312,7 @@
                                   </div>
                                   <div class="reply-delete-button-box">
                                     <a class="reply-delete-button reply-delete-${replier_id}" href="#" onclick="deleteReply('${post_id}','${replier_id}','${reply_id}')">
-                                      삭제
+                                      {{delete}}
                                     </a>
                                   </div>
       `
@@ -394,9 +383,9 @@
 <body>
   <div class="up-button">
     <a href="/user_info/{{userid}}">
-      <button class="button is-info">내 정보</button>
+      <button class="button is-info">{{my_info_name}}</button>
     </a>
-    <button id="logout-button" class="button is-danger" onclick="logout()">로그아웃</button>
+    <button id="logout-button" class="button is-danger" onclick="logout()">{{logout_name}}</button>
   </div>
 
   <section class="section">
