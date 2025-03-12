@@ -30,7 +30,6 @@
 
     .img-field {
       display: flex;
-      margin: 80px 0 0 0;
       justify-content: center;
     }
 
@@ -52,6 +51,20 @@
     .buttonmargin {
       margin-left: 10px
     }
+
+    /* 로고 */
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin: 10px;
+    }
+
+    .logo img {
+      max-width: 300px;
+      /* 로고 크기 조정 */
+      height: auto;
+    }
+    /* 로고 */
   </style>
 
   <!-- JS Function -->
@@ -114,8 +127,8 @@
 <body>
   <div class="container">
     <section class="section">
-      <div class="container has-text-centered">
-        <h2 class="title">{{heading}}</h2>
+      <div class="logo">
+        <img src="Jungle Sunday.png" alt="로고">
       </div>
     </section>
 
@@ -157,10 +170,11 @@
 
       <!-- 버튼 -->
       <div class="button-field">
+        <button class="button is-primary buttonmargin" onclick="postPost()">{{post}}</button>
         <a href="/main">
           <button class="button is-danger">{{back}}</button>
         </a>
-        <button class="button is-primary buttonmargin" onclick="postPost()">{{post}}</button>
+
       </div>
     </div>
 
