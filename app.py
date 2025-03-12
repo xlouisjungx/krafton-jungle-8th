@@ -33,15 +33,16 @@ class CustomJSONProvider(JSONProvider):
     
 app.json = CustomJSONProvider(app)
 
-
+#모든 템플릿 접근 전 실행됨, 토큰 유무 확인
 @app.before_request
 def load_current_user():
     g.current_user = None
+    #로그인, 회원가입은 토큰 확인 제외
     if request.endpoint in ['login', 'login_user', 'register', 'register_user']:
         return
     else: 
-        # '/login' 라우트에서는 토큰 검증을 하지 않음
-        # 다른 라우트에서는 토큰을 검증하고, 'g.current_user'를 설정
+        # 다른 라우트에서는 토큰을 검증하고, 토큰에서 ID를 추출하여 'g.current_user'로 설정
+        # g.current_user는 게시물 삭제 및 프로필 수정에서 보안과 관련됨
         token = request.cookies.get('access_token')
         if token:
             payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -50,43 +51,42 @@ def load_current_user():
         else:
             return redirect(url_for('login'))
 
-#전체 템플릿에서 사용할 전역변수 설정
+#전체 템플릿에서 사용할 전역변수(username)에 ID로 설정
 @app.context_processor
 def inject_user():
-   return dict(username = g.current_user)
+   return dict(userid = g.current_user)
 
-#GENERAL ROUTE
+#INDEX ROUTE
 @app.route('/')
 def index():
     if g.current_user != None:
+        #로그인되어 있을 경우 메인으로
         return redirect(url_for('main'))
     else:
+        #로그아웃되어 있을 경우 로그인 창으로
         return redirect(url_for('login'))
 
 
 #MAIN HTML
 @app.route('/main')
 def main():
-    try:
-      if not g.current_user:
-         return redirect(url_for('index'))
-
-      return render_template('main.html',
-                            title="Jungle Sunday",
-                            heading="Jungle Sunday",
-                            sub_head="일요일을 맛있게 보내자!",
-                            post="글쓰기",
-                            delete="삭제",
-                            ) 
-    except:
-      return redirect(url_for('index'))
+    return render_template('main.html',
+                          title="Jungle Sunday",
+                          heading="Jungle Sunday",
+                          sub_head="일요일을 맛있게 보내자!",
+                          post="글쓰기",
+                          delete="삭제",
+                          )
 
 @app.route('/main/post', methods=['GET', 'POST'])
 def handle_post():
+    #포스트 정보 불러옴
     if request.method == 'GET':
+      #_id가 내림차순 = 시간 내림차순으로 정렬
       result = list(db.post.find().sort({'_id': -1}))
       return jsonify({'result': 'success', 'posts': result})
     
+    #포스트 게시
     elif request.method == 'POST':
       poster_id_receive = request.form['poster_id_give']
       image_receive = request.form['image_give']
@@ -95,9 +95,9 @@ def handle_post():
       link_receive = request.form['link_give']
       post_time_receive = request.form['post_time_give']
 
+      #포스트시 g.current_user정보를 바탕으로 username 호출
       real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
       real_user_name = real_user_name_json['username']
-      print(real_user_name)
 
       post = {
         'real_user_name': real_user_name,
@@ -114,10 +114,12 @@ def handle_post():
       db.post.insert_one(post)
       return jsonify({'result': 'success'})
 
+#포스트 삭제
 @app.route('/main/post/delete', methods=['POST'])
 def delete_post():
   temp_id_receive = request.form['post_id_give']
   poster_id_receive = request.form['poster_id_give']
+  #게시자 id와 현재 유저 id 비교 후 다를 경우 삭제 불가능 (!!보안!!)
   if poster_id_receive != g.current_user:
       return jsonify({'result': 'failure'})
   
@@ -129,6 +131,7 @@ def delete_post():
   else:
       return jsonify({'result': 'failure'})
 
+#포스트 맛있어요
 @app.route('/main/post/like', methods=['POST'])
 def handle_like():
   temp_id_receive = request.form['post_id_give']
@@ -136,6 +139,7 @@ def handle_like():
   db.post.update_one({'_id': id_receive}, {'$inc': {'like': 1}})
   return jsonify({'result': 'success'})
 
+#포스트 맛없어요
 @app.route('/main/post/dislike', methods=['POST'])
 def handle_dislike():
   temp_id_receive = request.form['post_id_give']
@@ -159,14 +163,55 @@ def post():
 #USER_INFO HTML
 @app.route('/user_info/<poster_id>')
 def user_info(poster_id):
+   #DB에서 poster_id 바탕으로 post한 username 가져오기
+   poster_username_dic = db.users.find_one({'ID': poster_id}, {"_id": 0})
+   poster_username = '탈퇴한 사용자'
+   poster_classroom = '정보가 없습니다.'
+   poster_OS = '정보가 없습니다.'
+   poster_place = '정보가 없습니다.'
+   if poster_username_dic:
+       poster_username = poster_username_dic['username']
+       poster_classroom = poster_username_dic['classR']
+       poster_OS = poster_username_dic['OS']
+       poster_place = poster_username_dic['place']
+
    return render_template('user_info.html',
                           title="사용자 정보",
                           classroomNum="수강실",
-                          poster_id=poster_id,
+                          os="사용 운영 체제",
+                          place="위치",
+                          poster_username = poster_username,
+                          poster_id = poster_id,
+                          poster_classroom = poster_classroom,
+                          poster_OS = poster_OS,
+                          poster_place = poster_place,
                           )
 
-# @app.route('/user_info/<poster_id>', methods=['GET'])
-# def get_user_info(poster_id):
+@app.route('/user_info/<user_id>', methods=['POST'])
+def user_info_modify(user_id):
+  #게시자 id와 현재 유저 id 비교 후 다를 경우 삭제 불가능 (!!보안!!)
+  if user_id != g.current_user:
+    return jsonify({'result': 'failure'})
+  print('this')
+
+  classR_receive = request.form['classR_give']
+  OS_receive = request.form['OS_give']
+  place_receive = request.form['place_give']
+
+  #DB에서 user_id
+  result = db.users.update_one(
+      {'ID': user_id},
+      {"$set": {
+          "classR": classR_receive,
+          "OS": OS_receive,
+          "place": place_receive
+      }}
+  )
+
+  if result:
+    return jsonify({"result": "success", "message": "수정 완료!"})
+  else:
+    return jsonify({"result": "failure"})
 
 #LOGIN
 # 로그인 부분 (JWT 할당)
@@ -199,7 +244,6 @@ def login_user():
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     response = make_response(jsonify({"result": "success", "token": token}))
     response.set_cookie('access_token', token, httponly=True, secure=False, samesite='Strict', max_age=3600)
-
     return response
 
 @app.route('/login/logout', methods=["POST"])

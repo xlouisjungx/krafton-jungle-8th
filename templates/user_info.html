@@ -97,7 +97,7 @@
     let modifyMode = false
 
     $(document).ready(function () {
-      if ('{{username}}' === '{{poster_id}}') {
+      if ('{{userid}}' === '{{poster_id}}') {
         $('.downside-box').show()
       }
     });
@@ -115,7 +115,28 @@
     }
 
     function confirmModify() {
+      classroomModifyInput = $('#classroom-modify-input').val()
+      osModifyInput = $('#os-modify-input').val()
+      placeModifyInput = $('#place-modify-input').val()
 
+      $.ajax({
+        type: "POST",
+        url: "/user_info/{{poster_id}}",
+        data: {
+          classR_give: classroomModifyInput,
+          OS_give: osModifyInput,
+          place_give: placeModifyInput,
+        },
+        success: function (response) {            
+          if (response['result'] == 'success') {
+              alert(response.message)
+              window.location.reload();
+            } else {
+              alert('수정 실패ㅠㅠ')
+              window.location.reload();
+            }
+        }
+      })
     }
 
     function cancelModifyMode() {
@@ -128,16 +149,6 @@
       $('.info-modify-box').hide()
       $('#confirm-button').hide()
       $('#cancel-button').hide()
-    }
-
-    function getUserInfo() {
-      $.ajax({
-        type: "GET",
-        url: "/user_info/info",
-        data: {},
-        success: function (response) {
-        }
-      })
     }
 
     function setImage() {
@@ -168,21 +179,21 @@
     </div>
   
     <div class="info-box">
-      <h1 class="title is-1">{{poster_id}}</h1>
+      <h1 class="title is-1">{{poster_username}}</h1>
   
       <div class="info-sub-box">
         <h4 id="classroom-title" class="title is-4">{{classroomNum}}</h4>
-        <h5 id="classroom-num" class="subtitle is-5">Subtitle 4</h5>
+        <h5 id="classroom-num" class="subtitle is-5">{{poster_classroom}}</h5>
       </div>
   
       <div class="info-sub-box">
-        <h4 id="os-title" class="title is-4">사용 운영 체제</h4>
-        <h5 id="os-text" class="subtitle is-5">Subtitle 4</h5>
+        <h4 id="os-title" class="title is-4">{{os}}</h4>
+        <h5 id="os-text" class="subtitle is-5">{{poster_OS}}</h5>
       </div>
   
       <div class="info-sub-box">
-        <h4 id="place-title" class="title is-4">위치</h4>
-        <h5 id="place-text" class="subtitle is-5">Subtitle 4</h5>
+        <h4 id="place-title" class="title is-4">{{place}}</h4>
+        <h5 id="place-text" class="subtitle is-5">{{poster_place}}</h5>
       </div>
     </div>
 
@@ -194,21 +205,21 @@
   
       <div class="info-modify-sub-box">
         <h4 id="classroom-modify-title" class="title is-4">{{classroomNum}}</h4>
-        <input class="input info-input-zero" type="text" value="Subtitle 4">
+        <input id="classroom-modify-input" class="input info-input-zero" type="text" value="{{poster_classroom}}">
       </div>
   
       <div class="info-modify-sub-box">
-        <h4 id="os-modify-title" class="title is-4">사용 운영 체제</h4>
-        <input class="input info-input-zero" type="text" value="Subtitle 4">
+        <h4 id="os-modify-title" class="title is-4">{{os}}</h4>
+        <input id="os-modify-input" class="input info-input-zero" type="text" value="{{poster_OS}}">
       </div>
   
       <div class="info-modify-sub-box">
-        <h4 id="place-modify-title" class="title is-4">위치</h4>
-        <input class="input info-input-zero" type="text" value="Subtitle 4">
+        <h4 id="place-modify-title" class="title is-4">{{place}}</h4>
+        <input id="place-modify-input" class="input info-input-zero" type="text" value="{{poster_place}}">
       </div>
 
       <div class="info-modify-sub-box">
-        <h4 id="place-modify-title" class="title is-4">프로필 사진</h4>
+        <h4 id="profile-modify-title" class="title is-4">프로필 사진</h4>
         <div class="file is-boxed img-field">
           <label class="file-label">
             <input class="file-input" id="img-maker" type="file" name="resume" accept="image/*" onchange="setImage()" />
@@ -227,7 +238,7 @@
 
   <div class="buttons downside-box" style="display: none;">
     <button id="modify-button" class="button is-link" onclick="setModifyMode()">수정</button>
-    <button id="confirm-button" class="button is-info" onclick="" style="display: none;">확인</button>
+    <button id="confirm-button" class="button is-info" onclick="confirmModify()" style="display: none;">확인</button>
     <button id="cancel-button" class="button is-danger" onclick="cancelModifyMode()" style="display: none;">취소</button>
   </div>
 
