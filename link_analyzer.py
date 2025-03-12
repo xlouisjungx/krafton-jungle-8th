@@ -8,6 +8,10 @@ from bs4 import BeautifulSoup
 
 #trouble shooting => beautiful soup로는 동적인 요소 로드 불가능 => selenium활용
 def analyze_link(url):
+    if 'http' in url:
+        url = url.split('http')[1]
+        url = 'http' + url
+        
     options = webdriver.ChromeOptions()
     # options.add_argument("--headless")  # 브라우저 창을 띄우지 않고 실행 => 렌더링 문제로 띄우게 함.
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
