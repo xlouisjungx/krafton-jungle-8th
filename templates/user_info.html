@@ -135,6 +135,7 @@
       $('.profile-img-circle').hide()
       $('.info-box').hide()
       $('#modify-button').hide()
+      $('#withdrawal-button').hide()
 
       $('.profile-img-modify-circle').show()
       $('.info-modify-box').show()
@@ -172,6 +173,7 @@
       $('.profile-img-circle').show()
       $('.info-box').show()
       $('#modify-button').show()
+      $('#withdrawal-button').show()
 
       $('.profile-img-modify-circle').hide()
       $('.info-modify-box').hide()
@@ -265,7 +267,7 @@
   </div>
 
   <div class="buttons downside-box" style="display: none;">
-    <button id="modify-button" class="button is-danger" onclick="withdrawal()">회원탈퇴</button>
+    <button id="withdrawal-button" class="button is-danger" onclick="withdrawal()">회원탈퇴</button>
     <button id="modify-button" class="button is-link" onclick="setModifyMode()">수정</button>
     <button id="confirm-button" class="button is-info" onclick="confirmModify()" style="display: none;">확인</button>
     <button id="cancel-button" class="button is-danger" onclick="cancelModifyMode()" style="display: none;">취소</button>
