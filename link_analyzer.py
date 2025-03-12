@@ -14,32 +14,51 @@ def analyze_link(url):
     driver.get(url)
     time.sleep(1)
 
+    place_data = {
+        'title' : "",
+        'place' : "",
+        'phone_number' : ""
+    }
+
     # 페이지 로딩 후 HTML 가져오기
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    
     # 원하는 요소 선택
-
+    if "kakao" in url:
+        place_data = kakao_analyzer(soup)
+    elif "google" in url:
+        place_data = google_analyzer(soup)
+    else:
+        place_data = other_analyzer(soup)
 
     driver.quit()
+    return place_data
 
-def kakao_finder(soup):
+def place_data_changer(title, place, phone_number):
+    place_data = {
+        'title' : "",
+        'place' : "",
+        'phone_number' : ""
+    }
+    place_data['title'] = title
+    place_data['place'] = place
+    place_data['phone_number'] = phone_number
+
+    return place_data
+
+def kakao_analyzer(soup):
     title_tag = soup.find('meta', {'property': 'og:title'})
     title = ''
     if title_tag:
         title = title_tag.get('content')
     place = soup.select_one('#mainContent > div.main_detail.home > div.detail_cont > div.section_comm.section_defaultinfo > div.default_info > div:nth-child(1) > div > div:nth-child(1) > span').string.strip()
-    work_day = soup.select('#foldDetail2 > .line_fold > .tit_fold')
-    work_time = soup.select('#foldDetail2 > .line_fold > div > span')
-    for i in range(len(work_day)):
-      work_day[i] = work_day[i].string.strip()
-      work_time[i] = work_time[i].string.strip()
     phone_number = soup.select_one('#mainContent > div.main_detail.home > div.detail_cont > div.section_comm.section_defaultinfo > div.default_info > div:nth-child(3) > div > div > span').string.strip()
 
-def naver_finder():
+    place_data = place_data_changer(title, place, phone_number)
+    return place_data
+
+def google_analyzer(soup):
     i
 
-def google_finder():
+def other_analyzer(soup):
     i
 
-input_url = input()
-analyze_link(input_url)

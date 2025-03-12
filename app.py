@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 
+#링크 분석기
+from link_analyzer import analyze_link
 
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
@@ -51,7 +53,7 @@ def load_current_user():
         else:
             return redirect(url_for('login'))
 
-#전체 템플릿에서 사용할 전역변수(username)에 ID로 설정
+#전체 템플릿에서 사용할 전역변수(userid)에 ID로 설정
 @app.context_processor
 def inject_user():
    return dict(userid = g.current_user)
@@ -78,42 +80,49 @@ def main():
                           delete="삭제",
                           )
 
-@app.route('/main/post', methods=['GET', 'POST'])
+@app.route('/main/post', methods=['GET'])
 def handle_post():
     #포스트 정보 불러옴
-    if request.method == 'GET':
-      #_id가 내림차순 = 시간 내림차순으로 정렬
-      result = list(db.post.find().sort({'_id': -1}))
-      return jsonify({'result': 'success', 'posts': result})
-    
-    #포스트 게시
-    elif request.method == 'POST':
-      poster_id_receive = request.form['poster_id_give']
-      image_receive = request.form['image_give']
-      post_title_receive = request.form['post_title_give']
-      post_content_receive = request.form['post_content_give']
-      link_receive = request.form['link_give']
-      post_time_receive = request.form['post_time_give']
+    #_id가 내림차순 = 시간 내림차순으로 정렬
+    result = list(db.post.find().sort({'_id': -1}))
+    return jsonify({'result': 'success', 'posts': result})
 
-      #포스트시 g.current_user정보를 바탕으로 username 호출
-      real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
-      real_user_name = real_user_name_json['username']
+#포스트 생성
+@app.route('/main/post/create', methods=['POST'])
+def create_post():
+    poster_id_receive = request.form['poster_id_give']
+    image_receive = request.form['image_give']
+    post_title_receive = request.form['post_title_give']
+    post_content_receive = request.form['post_content_give']
+    link_receive = request.form['link_give']
+    post_time_receive = request.form['post_time_give']
+    place_title_receive= request.form['place_title_give']
+    place_place_receive= request.form['place_place_give']
+    place_phone_number_receive= request.form['place_phone_number_give']
 
-      post = {
-        'real_user_name': real_user_name,
-        'poster_id': poster_id_receive,
-        'image': image_receive,
-        'post_title': post_title_receive,
-        'post_content': post_content_receive,
-        'link': link_receive,
-        'post_time': post_time_receive,
-        'like': 0,
-        'dislike': 0,
-      }
+    #포스트시 g.current_user정보를 바탕으로 username 호출
+    real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
+    real_user_name = real_user_name_json['username']
 
-      db.post.insert_one(post)
-      return jsonify({'result': 'success'})
+    post = {
+      'real_user_name': real_user_name,
+      'poster_id': poster_id_receive,
+      'image': image_receive,
+      'post_title': post_title_receive,
+      'post_content': post_content_receive,
+      'link': link_receive,
+      'post_time': post_time_receive,
+      'like': 0,
+      'dislike': 0,
+      #place data
+      'title' : place_title_receive,
+      'place' : place_place_receive,
+      'phone_number' : place_phone_number_receive,
+    }
 
+    db.post.insert_one(post)
+    return jsonify({'result': 'success'})
+  
 #포스트 삭제
 @app.route('/main/post/delete', methods=['POST'])
 def delete_post():
@@ -160,6 +169,15 @@ def post():
                           check="장소 확인",
                           )
 
+#장소 확인
+@app.route('/post/place_check', methods=['POST'])
+def place_check():
+    place_url_receive = request.form['place_url_give']
+    if place_url_receive == 'no url':
+      return jsonify({'result': 'failure'})
+    place_data = analyze_link(place_url_receive)
+    return jsonify({'result': 'success', 'place_data': place_data})
+
 #USER_INFO HTML
 @app.route('/user_info/<poster_id>')
 def user_info(poster_id):
@@ -189,7 +207,7 @@ def user_info(poster_id):
 
 @app.route('/user_info/<user_id>', methods=['POST'])
 def user_info_modify(user_id):
-  #게시자 id와 현재 유저 id 비교 후 다를 경우 삭제 불가능 (!!보안!!)
+  #게시자 id와 현재 유저 id 비교 후 다를 경우 수정 불가능 (!!보안!!)
   if user_id != g.current_user:
     return jsonify({'result': 'failure'})
   print('this')
@@ -198,7 +216,7 @@ def user_info_modify(user_id):
   OS_receive = request.form['OS_give']
   place_receive = request.form['place_give']
 
-  #DB에서 user_id
+  #DB에서 user_id를 바탕으로 다른 정보 수정
   result = db.users.update_one(
       {'ID': user_id},
       {"$set": {

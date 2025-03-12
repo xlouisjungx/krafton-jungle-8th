@@ -34,6 +34,9 @@
       justify-content: center;
     }
 
+    #place-name {
+      margin: 0 5%;
+    }
     .place-link {
       display: flex;
       justify-content: center;
@@ -49,6 +52,12 @@
 
   <!-- JS Function -->
   <script>
+    let place_data = {
+        'title' : "",
+        'place' : "",
+        'phone_number' : ""
+    }
+
     function setImage() {
       // 파일을 선택한 경우
       let fileInput = document.getElementById('img-maker');
@@ -68,30 +77,74 @@
       }
     }
 
+    function checkPlace() {
+      let place_url = 'no url'
+      if ($('#post-link').val() !== '') {
+        place_url = $('#post-link').val()
+      }
+      addPlaceComponent("장소 찾는 중")
+
+      $.ajax({
+        type: "POST",
+        url: "/post/place_check",
+        data: { 
+          place_url_give: place_url
+        }, // 데이터를 주는 방법
+        success: function (response) { // 성공하면
+          if (response["result"] == "success") {
+            if (response["place_data"] !== '') {
+              addPlaceComponent(response["place_data"]["title"])
+              place_data = response["place_data"]
+            } else {
+              addPlaceComponent('장소 불러오기 실패! 업로드시 장소 정보가 없을 수 있습니다.')
+            }
+          } else {
+            addPlaceComponent('장소 불러오기 실패! 업로드시 장소 정보가 없을 수 있습니다.')
+          }
+        }
+      })
+    }
+
+    function addPlaceComponent(placeName) {
+      let temp_place_html = /*html*/
+      `
+        <p>${placeName}</p>
+      `
+      $("#place-name").html("")
+      $("#place-name").append(temp_place_html)
+    }
+
     function postPost() {
       let poster_id = "{{userid}}"
       let image = $('#image-container').attr('src')
       let post_title = $('#post-title').val()
       let post_content = $('#post-content').val()
-      let link = ''
+      let link = 'no url'
+      if ($('#post-link').val() !== '') {
+        link = $('#post-link').val()
+      }
       const now = new Date();
       const formattedDate = now.toString().split(" GMT")[0];
       let post_time = formattedDate
 
       $.ajax({
         type: "POST", // POST 방식으로 요청하겠다.
-        url: "/main/post", // /memo라는 url에 요청하겠다.
+        url: "/main/post/create",
         data: { 
           poster_id_give: poster_id,
           image_give: image,
           post_title_give: post_title,
           post_content_give: post_content,
           link_give: link,
-          post_time_give: post_time }, // 데이터를 주는 방법
+          post_time_give: post_time,
+          place_title_give: place_data['title'],
+          place_place_give: place_data['place'],
+          place_phone_number_give: place_data['phone_number'],
+        }, // 데이터를 주는 방법
         success: function (response) { // 성공하면
           if (response["result"] == "success") {
             alert("포스팅 성공!");
-            // 3. 성공 시 페이지 새로고침하기
+            //성공 시 페이지 이동하기
             window.location.href = "/main";
           } else {
             alert("서버 오류!")
@@ -119,7 +172,7 @@
 
   <div class="place-link">
     <input class="input is-normal" id="post-link" type="text" placeholder="link"/>
-    <button class="button is-info">{{check}}</button>
+    <button class="button is-info" onclick="checkPlace()">{{check}}</button>
   </div>
 
   <div id="place-name">

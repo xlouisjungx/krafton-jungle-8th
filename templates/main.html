@@ -42,7 +42,9 @@
     .delete-button {
       margin-top: 20px;
     }
-
+    .subtitle-margin-size{
+      margin: 0px
+    }
     #logout-button{
       margin-left: 10px;
     }
@@ -63,7 +65,21 @@
         success: function (response) {
           let posts = response["posts"];
           for (let i = 0; i < posts.length; i++) {
-            makePost(posts[i]["real_user_name"], posts[i]["_id"], posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["dislike"], posts[i]["post_time"])
+            makePost(
+              posts[i]["real_user_name"], 
+              posts[i]["_id"], 
+              posts[i]["image"], 
+              posts[i]["poster_id"], 
+              posts[i]["post_title"], 
+              posts[i]["post_content"], 
+              posts[i]["link"], 
+              posts[i]["like"], 
+              posts[i]["dislike"], 
+              posts[i]["post_time"],
+              posts[i]["title"], 
+              posts[i]["place"], 
+              posts[i]["phone_number"],
+            )
           }
 
           if (posts.length === 0) {
@@ -73,7 +89,21 @@
       })
     }
 
-    function makePost(real_user_name, post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
+    function makePost(
+      real_user_name, 
+      post_id, 
+      image, 
+      poster_id, 
+      post_title, 
+      post_content, 
+      link, 
+      likes, 
+      dislikes, 
+      post_time,
+      place_title,
+      place_where,
+      place_phone_number,
+    ) {
       let temp_html = /*html*/`<div class="tile is-parent">
                                 <article class="tile is-child box">
                                   <a href="/user_info/${poster_id}">
@@ -84,7 +114,11 @@
                                       ${real_user_name}
                                     </a>
                                   <p>
-                                  <p class="subtitle">${post_time}</p>
+                                  <div id="place-explanation">
+                                    ${place_title ? `<p><a href="${link}">${place_title}</a>에서</p>` : ''}
+                                    <p>${post_time}${place_where ? ` ${place_where}` : ''}</p>
+                                    ${place_phone_number ? `<p>${place_phone_number}</p>` : ''}
+                                  </div>
                                   <figure class="image">
                                     <img src="${image}">
                                   </figure>
@@ -101,6 +135,7 @@
                                   </div>
                                 </article>
                       </div>`;
+      
       
       $("#post-display").append(temp_html);
       if (poster_id !== '{{userid}}') {
