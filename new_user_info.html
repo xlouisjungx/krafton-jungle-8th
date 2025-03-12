@@ -165,6 +165,7 @@
     function confirmModify() {
       classroomModifyInput = $('#classroom-modify-input').val()
       osModifyInput = $('#os-modify-input').val()
+      placeModifyInput = $('#place-modify-input').val()
 
       $.ajax({
         type: "POST",
@@ -172,6 +173,7 @@
         data: {
           classR_give: classroomModifyInput,
           OS_give: osModifyInput,
+          place_give: placeModifyInput,
         },
         success: function (response) {
           if (response['result'] == 'success') {
@@ -231,6 +233,7 @@
           </div>
         </section>
         <div class="card">
+
           <div class="upside-box">
             <div class="profile-img-circle">
               <img id="profile-img">
@@ -249,18 +252,10 @@
                 <h5 id="os-text" class="subtitle is-5">{{poster_OS}}</h5>
               </div>
 
-              <div class="info-sub-box">
-                <h4 id="place-title" class="title is-4">{{place}}</h4>
-                <h5 id="place-text" class="subtitle is-5">{{poster_place}}</h5>
-              </div>
             </div>
 
 
             <!-- \자리에 style="display: none;" 지운 것들 까먹지말고 추가  -->
-            <div class="profile-img-modify-circle" style="display: none;">
-                <img id="profile-modify-img">
-              </div>
-            
             <div>
               <div class="profile-img-modify-circle" style="display: none;">
                 <img id="profile-modify-img">
@@ -268,12 +263,10 @@
 
               <!-- \자리에 style="display: none; 지운 것들 까먹지말고 추가 -->
               <div class="info-modify-box" style="display: none;">
-              <div class="info-modify-box" style="display: none;">
 
                 <div class="info-modify-sub-box">
                   <h4 id="classroom-modify-title" class="title is-4">{{classroomNum}}</h4>
-                  <input id="classroom-modify-input" class="input info-input-zero" type="text"
-                    value="{{poster_classroom}}">
+                  <input id="classroom-modify-input" class="input info-input-zero" type="text" value="{{poster_classroom}}">
                 </div>
 
                 <div class="info-modify-sub-box">
@@ -288,8 +281,7 @@
                       </select>
                     </div>
                     <!-- <input id="os-modify-input" class="input info-input-zero" type="text" value="{{poster_OS}}"> -->
-                    <input id="place-modify-input" class="input info-input-zero" type="text" value="{{poster_place}}">
-                </div>
+                  </div>
                 </div>
 
                 <div class="info-modify-sub-box">
