@@ -82,11 +82,11 @@
 
     <script>
         function login() {
-            const Email = document.getElementById('Email').value; // 사용자 아이디
+            const ID = document.getElementById('ID').value; // 사용자 아이디
             const password = document.getElementById('password').value; // 비밀번호
 
             // 아이디와 비밀번호가 비어있는지 확인
-            if (!Email || !password) {
+            if (!ID || !password) {
                 alert("아이디와 비밀번호를 입력하세요.");
                 return;
             }
@@ -96,7 +96,7 @@
                 type: "POST",
                 url: "/login/signIn",
                 data: {
-                    Email_give: Email,
+                    ID_give: ID,
                     password_give: password
                 },
                 success: function (result) {

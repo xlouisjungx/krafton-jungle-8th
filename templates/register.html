@@ -62,7 +62,7 @@
                 <label for="classR" class="label">사용중인 OS</label>
                 <div class="control">
                     <div class="select">
-                        <select>
+                        <select id="OS">
                             <option>Window</option>
                             <option>MAC</option>
                         </select>
@@ -109,7 +109,7 @@
             <div class="submit">
                 <div class="field is-grouped">
                     <div class="control">
-                        <button class="button is-primary">가입</button>
+                        <button class="button is-primary" onclick="registerUser()">회원가입</button>
                     </div>
                     <div class="control">
                         <button class="button is-danger">취소</button>
@@ -124,12 +124,18 @@
             const username = $("#username").val();
             const classR = $("#classR").val();
             const OS = $("#OS").val();
-            const place = $("#place").val();
             const Email = $("#Email").val();
             const ID = $("#ID").val();
             const password = $("#password").val();
             const password2 = $("#password2").val();
 
+            console.log(username)
+            console.log(classR)
+            console.log(OS)
+            console.log(Email)
+            console.log(ID)
+            console.log(password)
+            
             if (!username || !classR || !OS || !Email || !ID || !password || !password2) {
                 alert("모든 정보를 입력하세요.");
                 return;
@@ -157,7 +163,6 @@
                     username_give: username,
                     classR_give: classR,
                     OS_give: OS,
-                    place_give: place,
                     Email_give: Email,
                     ID_give: ID,
                     password_give: password,
