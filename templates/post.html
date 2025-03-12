@@ -57,6 +57,7 @@
         'place' : "",
         'phone_number' : ""
     }
+    let warning_sentence = '장소 불러오기 실패! 장소 정보는 업로드 되지 않습니다.'
 
     function setImage() {
       // 파일을 선택한 경우
@@ -96,10 +97,10 @@
               addPlaceComponent(response["place_data"]["title"])
               place_data = response["place_data"]
             } else {
-              addPlaceComponent('장소 불러오기 실패! 업로드시 장소 정보가 없을 수 있습니다.')
+              addPlaceComponent(warning_sentence)
             }
           } else {
-            addPlaceComponent('장소 불러오기 실패! 업로드시 장소 정보가 없을 수 있습니다.')
+            addPlaceComponent(warning_sentence)
           }
         }
       })
