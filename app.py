@@ -81,6 +81,9 @@ def main():
                           sub_head="일요일을 맛있게 보내자!",
                           post="글쓰기",
                           delete="삭제",
+                          transmit_name="전송",
+                          my_info_name="내 정보",
+                          logout_name="로그아웃"
                           )
 
 @app.route('/main/post', methods=['GET'])
@@ -241,6 +244,7 @@ def post():
                           back="뒤로가기",
                           upload="사진 불러오기",
                           check="장소 확인",
+                          choose_file_name="Choose a file..."
                           )
 
 #장소 확인
@@ -280,6 +284,10 @@ def user_info(poster_id):
                           poster_classroom = poster_classroom,
                           poster_OS = poster_OS,
                           poster_place = poster_place,
+                          withdrawal_name = "회원탈퇴",
+                          modify_name = "수정",
+                          check_name = "확인",
+                          cancel_name = "취소",
                           )
 
 @app.route('/user_info/<user_id>', methods=['POST'])
@@ -311,7 +319,12 @@ def user_info_modify(user_id):
 # 로그인 부분 (JWT 할당)
 @app.route('/login')
 def login():
-   return render_template('login.html')
+   return render_template('login.html',
+                          id_value = 'ID',
+                          password_value = 'Password',
+                          login_name = '로그인',
+                          signup_name = '회원가입',
+                          )
 
 @app.route('/login/signIn', methods=["POST"])
 def login_user():
@@ -367,7 +380,20 @@ def protected():
 # 회원가입 API
 @app.route("/register")
 def register():
-   return render_template('register.html')
+   return render_template('register.html',
+                          signup_name = "회원가입",
+                          name_name = "이름",
+                          classroom_name = "강의실",
+                          usingOS_name = "사용중인 OS",
+                          window_name = "Window",
+                          mac_name = "MAC",
+                          place_name = "위치",
+                          email_name = "Email",
+                          id_name = "ID",
+                          password_name = "패스워드",
+                          password_check_name = "패스워드 확인",
+                          cancel_name = "취소"
+                          )
 
 @app.route("/register", methods=["POST"])
 def register_user():
