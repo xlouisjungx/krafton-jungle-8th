@@ -104,6 +104,10 @@ def create_post():
     real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
     real_user_name = real_user_name_json['username']
 
+    if 'http' in link_receive:
+      link_receive = link_receive.split('http')[1]
+      link_receive = 'http' + link_receive
+
     post = {
       'real_user_name': real_user_name,
       'poster_id': poster_id_receive,
@@ -334,7 +338,14 @@ def register_user():
     except Exception as e:
         return jsonify({"result": "error", "message": "회원가입 중 오류가 발생했습니다: {str(e)}"})
 
-
+#회원탈퇴
+@app.route("/withdrawal", methods=['POST'])
+def withdrawal():
+  result = db.users.delete_one({'ID': g.current_user})
+  if result.deleted_count > 0:
+    return jsonify({"result": "success", "message": "회원탈퇴 완료!"})
+  else:
+    return jsonify({"result": "failure"})
 
 if __name__ == '__main__':  
    app.run('0.0.0.0',port=5001,debug=True)

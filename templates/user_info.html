@@ -101,6 +101,34 @@
         $('.downside-box').show()
       }
     });
+    
+    function withdrawal() {
+      $.ajax({
+        type: "POST",
+        url: "/withdrawal",
+        data: {},
+        success: function (response) {            
+          if (response['result'] == 'success') {
+              alert(response.message)
+              window.location.reload();
+            } else {
+              alert('탈퇴 실패')
+              window.location.reload();
+            }
+        }
+      })
+
+      $.ajax({
+          type: "POST",
+          url: "/login/logout",
+          success: function (response) {
+            if (response['result'] == 'success') {
+              window.location.href = "/"; 
+            } else {
+            }
+          }
+        });
+    }
 
     function setModifyMode() {
       modifyMode = true
@@ -237,6 +265,7 @@
   </div>
 
   <div class="buttons downside-box" style="display: none;">
+    <button id="modify-button" class="button is-danger" onclick="withdrawal()">회원탈퇴</button>
     <button id="modify-button" class="button is-link" onclick="setModifyMode()">수정</button>
     <button id="confirm-button" class="button is-info" onclick="confirmModify()" style="display: none;">확인</button>
     <button id="cancel-button" class="button is-danger" onclick="cancelModifyMode()" style="display: none;">취소</button>
