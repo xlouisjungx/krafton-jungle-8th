@@ -15,7 +15,10 @@
 
   <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
   <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
-  <!-- 타이틀 확인 -->
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
 
   <!-- 아이콘 -->
   <title>main</title>
@@ -48,7 +51,7 @@
     .buttonpost {
       display: flex;
       justify-content: right;
-      
+
     }
 
     .side {
@@ -68,14 +71,103 @@
       margin-bottom: 30px;
     }
 
-    .green{
+    .red {
       color: red;
     }
 
-    .trash
-    {
+    .trash {
       margin-top: 10px;
     }
+
+    /* 로고 스타일 */
+    .logo {
+      display: flex;
+      justify-content: left;
+      margin: 10px;
+    }
+
+    .logo img {
+      max-width: 150px;
+      /* 로고 크기 조정 */
+      height: auto;
+    }
+
+    /* 슬라이드 css */
+
+    body {
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    swiper-container {
+      width: 100%;
+      height: 400px;
+    }
+
+    swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+
+    /* 댓글 */
+    .comment-toggle {
+      cursor: pointer;
+      color: gray;
+      text-decoration: none;
+    }
+
+    .comment-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .comment-section {
+      margin-top: 10px;
+      display: none;
+      /* 기본적으로 숨김 */
+    }
+
+    .comments-list {
+      margin-top: 10px;
+    }
+
+    /* 댓글 */
+
+    /* 드롭다운 */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+
+    .dropdown-menu {
+      display: none;
+      /* 기본적으로 숨김 */
+    }
+
+    .dropdown-menu.is-active {
+      display: block;
+      /* 활성화 시 보임 */
+    }
+
+    #profile-image {
+      cursor: pointer;
+      /* 커서를 손가락 모양으로 변경 */
+    }
+
+    /* 드롭다운 */
   </style>
 
   <!-- JS Function -->
@@ -182,6 +274,33 @@
         }
       });
     }
+
+    // 슬라이드js
+    const swiper = new Swiper('.swiper', {
+      // Optional parameters
+      direction: 'vertical',
+      loop: true,
+
+      // If we need pagination
+      pagination: {
+        el: '.swiper-pagination',
+      },
+
+      // Navigation arrows
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+
+      // And if we need scrollbar
+      scrollbar: {
+        el: '.swiper-scrollbar',
+      },
+    });
+    // 슬라이드js
+
+
+
   </script>
 
 
@@ -189,25 +308,42 @@
 
 <body>
   <div class="container">
-    <section class="section">
-      <div class="container has-text-centered">
-        <h2 class="title">{{heading}}</h2>
-        <p>{{sub_head}}</p>
+
+    <!-- 헤더 -->
+    <nav class="navbar side">
+
+      <!-- 로고 -->
+        <div class="logo">
+          <img src="Jungle Sunday.png" alt="로고">
+        </div>
+      <!-- 로고 -->
+
+      <!-- 드롭다운 -->
+      <div class="dropdown ">
+        <div class="dropdown-trigger">
+          <figure class="image is-64x64" id="profile-image">
+            <img class="is-rounded" src="https://bulma.io/assets/images/placeholders/96x96.png"
+              alt="Placeholder image" />
+          </figure>
+        </div>
+        <div class="dropdown-menu is-right" id="dropdown-menu3" role="menu">
+          <div class="dropdown-content">
+            <!-- 글쓰기 post버튼 -->
+            <a href="/post" class="dropdown-item"> {{post}} </a>
+            <div id="post-display"></div>
+            <!-- 글쓰기 post버튼 -->
+            <!-- 내 정보 -->
+            <a href="/user_info/{{userid}}" class="dropdown-item"> 내 정보 </a>
+            <!-- 내 정보 -->
+            <hr class="dropdown-divider" />
+            <a href="#" id="logout-button" class="dropdown-item" onclick="logout()"> 로그아웃 </a>
+          </div>
+        </div>
       </div>
-    </section>
+      <!-- 드롭다운 -->
+    </nav>
 
-
-    <!-- 포스트 버튼 -->
     <div class="side">
-      <div class="buttonpost">
-        <a href="/post">
-          <button class="button is-ghost">{{post}}</button>
-        </a>
-      </div>
-
-      <div id="post-display">
-      </div>
-
       <!-- 카드 -->
       <div class="cardmargin">
         <div class="card">
@@ -219,22 +355,32 @@
                 </figure>
               </div>
               <!-- 프로필 -->
-              <div class="media-content" >
+              <div class="media-content">
                 <p class="title is-4">John Smith</p>
                 <p class="subtitle is-6">@johnsmith</p>
               </div>
 
               <!-- 삭제 아이콘 -->
               <div class="trash">
-                <a class="green" href="#"><i class="fa-solid fa-trash"></i></a>
+                <a class="red" href="#"><i class="fa-solid fa-trash"></i></a>
               </div>
+            </div>
 
-            </div>
-            <div class="card-image">
-              <figure class="image is-4by3">
-                <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="Placeholder image" />
-              </figure>
-            </div>
+            <!-- 원래 이미지 부분 -->
+            <!-- <div class="card-image"> -->
+            <!-- <figure class="image is-4by3"> -->
+            <!-- <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="Placeholder image" /> -->
+            <!-- </figure> -->
+            <!-- </div> -->
+
+            <!-- 슬라이드 -->
+            <swiper-container class="mySwiper" pagination="true">
+              <swiper-slide>Slide 1</swiper-slide>
+              <swiper-slide>Slide 2</swiper-slide>
+              <swiper-slide>Slide 3</swiper-slide>
+            </swiper-container>
+
+
             <!-- 카드 하단 제목 리뷰 -->
             <div class="content">
               <h1>jemok</h1>
@@ -246,8 +392,7 @@
               <br>
               <!-- 아이콘 -->
               <div class="icongroup">
-                <!-- 댓글 아이콘 --> 
-                <span class="icon"><i class="fa-solid fa-comment fa-lg"></i></span>
+
                 <!-- 좋아요 아이콘 -->
                 <span class="icon iconleft"><i class="fa-solid fa-thumbs-up fa-lg"></i>
                 </span>
@@ -255,17 +400,118 @@
                 <!-- 싫어요 아이콘 -->
                 <span class="icon iconleft"><i class="fas fa-thumbs-down fa-lg"></i>
                 </span>
-                <span class="movie-likes">${likes}</span>
+                <span class="movie-likes">${dislikes}</span>
               </div>
 
             </div>
             <hr>
             <!-- 카드 하단 제목 리뷰 -->
+
+            <!-- 댓글 -->
+            <div class="post">
+              <p class="comment-toggle">댓글 달기..</p>
+              <div class="comment-section">
+                <article class="media">
+                  <figure class="media-left">
+                    <p class="image is-64x64">
+                      <img src="https://bulma.io/assets/images/placeholders/128x128.png" alt="Profile Image" />
+                    </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="field">
+                      <p class="control">
+                        <textarea class="textarea" placeholder="댓글을 입력하세요..."></textarea>
+                      </p>
+                    </div>
+                    <nav class="level">
+                      <div class="level-left">
+                        <div class="level-item">
+                          <button class="button is-info comment-button">전송</button>
+                        </div>
+                      </div>
+
+                    </nav>
+                  </div>
+                </article>
+                <div class="comments-list"></div>
+              </div>
+            </div>
+            <!-- 댓글 -->
           </div>
         </div>
       </div>
+      <!-- 카드 -->
     </div>
   </div>
+  </div>
+  </div>
+
+  <!-- 드롭다운js -->
+  <script>
+    // 드롭다운 트리거 요소
+    const profileImage = document.getElementById('profile-image');
+    // 드롭다운 메뉴 요소
+    const dropdownMenu = document.getElementById('dropdown-menu3');
+
+    // 프로필 이미지 클릭 이벤트 처리
+    profileImage.addEventListener('click', function () {
+      dropdownMenu.classList.toggle('is-active'); // 드롭다운 메뉴의 표시 상태를 토글
+    });
+
+    // 바깥 클릭 시 드롭다운 닫기
+    document.addEventListener('click', function (event) {
+      if (!profileImage.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('is-active'); // 드롭다운 메뉴 닫기
+      }
+    });
+  </script>
+  <!-- 드롭다운js -->
+
+
+
+
+  <!-- 댓글 달기js -->
+  <script>
+    // 댓글 달기 버튼 클릭 이벤트
+    document.querySelector('.comment-toggle').addEventListener('click', function () {
+      const commentSection = document.querySelector('.comment-section');
+      // Toggle display
+      if (commentSection.style.display === 'none' || commentSection.style.display === '') {
+        commentSection.style.display = 'block'; // 댓글 입력란 보이기
+      } else {
+        commentSection.style.display = 'none'; // 댓글 입력란 숨기기
+      }
+    });
+
+    // 전송 버튼 클릭 이벤트
+    document.querySelector('.comment-button').addEventListener('click', function () {
+      const commentInput = document.querySelector('.textarea');
+      const commentsList = document.querySelector('.comments-list');
+
+      // 댓글 입력이 비어 있지 않은 경우
+      if (commentInput.value.trim() !== '') {
+        // 새로운 댓글 생성
+        const newComment = document.createElement('div');
+        newComment.textContent = commentInput.value;
+        commentsList.appendChild(newComment);
+        commentInput.value = ''; // 입력 필드 초기화
+      } else {
+        alert('댓글을 입력하세요!');
+      }
+    });
+
+    // Enter 키로 전송 기능
+    document.querySelector('.textarea').addEventListener('keypress', function (event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // 기본 Enter 동작 방지
+        document.querySelector('.comment-button').click(); // 전송 버튼 클릭
+      }
+    });
+  </script>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 </body>
 
 </html>
