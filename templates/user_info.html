@@ -204,10 +204,6 @@
 
 <body>
   <div class="upside-box">
-    <div class="profile-img-circle">
-      <img id="profile-img">
-    </div>
-  
     <div class="info-box">
       <h1 class="title is-1">{{poster_username}}</h1>
   
@@ -247,30 +243,15 @@
         <h4 id="place-modify-title" class="title is-4">{{place}}</h4>
         <input id="place-modify-input" class="input info-input-zero" type="text" value="{{poster_place}}">
       </div>
-
-      <div class="info-modify-sub-box">
-        <h4 id="profile-modify-title" class="title is-4">프로필 사진</h4>
-        <div class="file is-boxed img-field">
-          <label class="file-label">
-            <input class="file-input" id="img-maker" type="file" name="resume" accept="image/*" onchange="setImage()" />
-            <span class="file-cta">
-              <span class="file-icon">
-                <i class="fas fa-upload"></i>
-              </span>
-              <span class="file-label"> Choose a file… </span>
-            </span>
-          </label>
-        </div>
-      </div>
     </div>
 
   </div>
 
   <div class="buttons downside-box" style="display: none;">
-    <button id="withdrawal-button" class="button is-danger" onclick="withdrawal()">회원탈퇴</button>
-    <button id="modify-button" class="button is-link" onclick="setModifyMode()">수정</button>
-    <button id="confirm-button" class="button is-info" onclick="confirmModify()" style="display: none;">확인</button>
-    <button id="cancel-button" class="button is-danger" onclick="cancelModifyMode()" style="display: none;">취소</button>
+    <button id="withdrawal-button" class="button is-danger" onclick="withdrawal()">{{withdrawal_name}}</button>
+    <button id="modify-button" class="button is-link" onclick="setModifyMode()">{{modify_name}}</button>
+    <button id="confirm-button" class="button is-info" onclick="confirmModify()" style="display: none;">{{check_name}}</button>
+    <button id="cancel-button" class="button is-danger" onclick="cancelModifyMode()" style="display: none;">{{cancel_name}}</button>
   </div>
 
 
