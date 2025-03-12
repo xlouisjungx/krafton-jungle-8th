@@ -165,7 +165,6 @@
     function confirmModify() {
       classroomModifyInput = $('#classroom-modify-input').val()
       osModifyInput = $('#os-modify-input').val()
-      placeModifyInput = $('#place-modify-input').val()
 
       $.ajax({
         type: "POST",
@@ -173,7 +172,6 @@
         data: {
           classR_give: classroomModifyInput,
           OS_give: osModifyInput,
-          place_give: placeModifyInput,
         },
         success: function (response) {
           if (response['result'] == 'success') {
@@ -292,11 +290,6 @@
                     <!-- <input id="os-modify-input" class="input info-input-zero" type="text" value="{{poster_OS}}"> -->
                     <input id="place-modify-input" class="input info-input-zero" type="text" value="{{poster_place}}">
                 </div>
-                </div>
-
-                <div class="info-modify-sub-box">
-                  <h4 id="place-modify-title" class="title is-4">{{place}}</h4>
-                  <input id="place-modify-input" class="input info-input-zero" type="text" value="{{poster_place}}">
                 </div>
 
                 <div class="info-modify-sub-box">
