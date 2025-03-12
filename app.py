@@ -213,7 +213,7 @@ def create_reply(post_id):
 
 #포스트 삭제
 @app.route('/main/reply/<post_id>/delete', methods=['POST'])
-def delete_reply(post_id):
+def delete_reply(post_id): 
     replier_id_receive = request.form['replier_id_give']
     reply_id_receive = request.form['reply_id_give']
     #댓글 게시자 id와 현재 유저 id 비교 후 다를 경우 삭제 불가능 (!!보안!!)
@@ -250,7 +250,10 @@ def place_check():
     if place_url_receive == 'no url':
       return jsonify({'result': 'failure'})
     place_data = analyze_link(place_url_receive)
-    return jsonify({'result': 'success', 'place_data': place_data})
+    if place_data:
+        return jsonify({'result': 'success', 'place_data': place_data})
+    else:
+       return jsonify({'result': 'failure'})
 
 #USER_INFO HTML
 @app.route('/user_info/<poster_id>')

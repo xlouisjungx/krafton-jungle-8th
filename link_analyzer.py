@@ -29,31 +29,31 @@ def analyze_link(url):
 
         # 페이지 로딩 후 HTML 가져오기
         # 원하는 요소 선택
-            if "kakao" in current_url:
-                after_place = ''
-                if 'item' in current_url:
-                    after_place = current_url.split("itemId=")[1]
-                    new_url = 'https://place.map.kakao.com/' + after_place
-                else:
-                    new_url=current_url
-                driver.get(new_url)
-                time.sleep(2)
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
-                place_data = kakao_analyzer(soup)
-            #네이버는 html안에 또 다른 html이 있음
-            elif "naver" in current_url:
-                after_place = ''
-                if 'restaurant' in current_url:
-                    after_place = current_url.split("restaurant/")[1]
-                elif 'place' in current_url:
-                    after_place = current_url.split("place/")[1]
-                base_url = 'https://pcmap.place.naver.com/restaurant/' + after_place
-                driver.get(base_url)
-                time.sleep(2)
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
-                place_data = naver_analyzer(soup)
+        if "kakao" in current_url:
+            after_place = ''
+            if 'item' in current_url:
+                after_place = current_url.split("itemId=")[1]
+                new_url = 'https://place.map.kakao.com/' + after_place
             else:
-                place_data = other_analyzer(soup)
+                new_url=current_url
+            driver.get(new_url)
+            time.sleep(2)
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            place_data = kakao_analyzer(soup)
+        #네이버는 html안에 또 다른 html이 있음
+        elif "naver" in current_url:
+            after_place = ''
+            if 'restaurant' in current_url:
+                after_place = current_url.split("restaurant/")[1]
+            elif 'place' in current_url:
+                after_place = current_url.split("place/")[1]
+            base_url = 'https://pcmap.place.naver.com/restaurant/' + after_place
+            driver.get(base_url)
+            time.sleep(2)
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            place_data = naver_analyzer(soup)
+        else:
+            place_data = other_analyzer(soup)
     except:
         place_data = None
 
