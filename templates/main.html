@@ -103,7 +103,7 @@
                       </div>`;
       
       $("#post-display").append(temp_html);
-      if (poster_id !== '{{username}}') {
+      if (poster_id !== '{{userid}}') {
         $(`#delete-${post_id}`).hide()
       }
     }
@@ -181,7 +181,7 @@
 
 <body>
   <div class="up-button">
-    <a href="/user_info/{{username}}">
+    <a href="/user_info/{{userid}}">
       <button class="button is-info">내 정보</button>
     </a>
     <button id="logout-button" class="button is-danger" onclick="logout()">로그아웃</button>
