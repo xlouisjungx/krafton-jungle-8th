@@ -1,5 +1,6 @@
 from bson import ObjectId
 import json
+import uuid
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, g, make_response
 from flask.json.provider import JSONProvider
@@ -7,7 +8,6 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
-
 #링크 분석기
 from link_analyzer import analyze_link
 
@@ -16,6 +16,9 @@ client = MongoClient('localhost', 27017)
 db = client.jungle_sunday
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # JWT 비밀키 설정
 JWT_SECRET = 'Sunday'
@@ -84,9 +87,12 @@ def main():
 def handle_post():
     #포스트 정보 불러옴
     #_id가 내림차순 = 시간 내림차순으로 정렬
-    result = list(db.post.find().sort({'_id': -1}))
-    return jsonify({'result': 'success', 'posts': result})
+    post_result = list(db.post.find().sort({'_id': -1}))
+    reply_result = list(db.replies.find())
 
+    return jsonify({'result': 'success', 'posts': post_result, 'replies': reply_result})
+
+#포스트 게시물 관련
 #포스트 생성
 @app.route('/main/post/create', methods=['POST'])
 def create_post():
@@ -160,6 +166,70 @@ def handle_dislike():
   db.post.update_one({'_id': id_receive}, {'$inc': {'dislike': 1}})
   return jsonify({'result': 'success'})
 
+#댓글 관련
+#댓글 보기
+@app.route('/main/reply/<post_id>', methods=['GET'])
+def get_reply(post_id):
+    result = db.replies.find_one({'post_id': post_id})
+    if result:
+      return jsonify({'result': 'success', 'replies': result})
+    else:
+      return jsonify({'result': 'failure'})
+
+#댓글 생성
+@app.route('/main/reply/<post_id>/create', methods=['POST'])
+def create_reply(post_id):
+    reply_content_receive = request.form['reply_content_give']
+    reply_time_receive = request.form['reply_time_give']
+
+    #댓글 생성시 g.current_user정보를 바탕으로 username 호출
+    real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
+    real_user_name = real_user_name_json['username']
+    reply_id = str(uuid.uuid4())
+
+    reply = {
+        'reply_id': reply_id,
+        'real_user_name': real_user_name, #댓글 작성자 이름
+        'replier_id' : g.current_user,
+        'reply_content': reply_content_receive, #댓글 내용
+        'reply_time': reply_time_receive, #댓글 달린 시간
+    }
+
+    #고민지점
+    #댓글별로 하나씩 테이블에 저장하는 게 나을까
+    #하나의 열에 리스트 형태로 저장하는 게 나을까 (선택) - 댓글별로 저장하면 쿼리할 때 게시글 ID 기준으로 찾으면 시간 오래걸릴듯
+    result = db.replies.find_one({'post_id': post_id})
+    if result:
+      db.replies.update_one(
+          {'post_id': post_id},
+          {'$push': {'replies': reply}}  # replies 배열에 새로운 댓글 추가
+      )
+    else:
+      db.replies.insert_one({
+        'post_id': post_id,
+        'replies': [reply]  # replies 배열로 댓글을 처음 삽입
+      })
+    return jsonify({'result': 'success'})
+
+#포스트 삭제
+@app.route('/main/reply/<post_id>/delete', methods=['POST'])
+def delete_reply(post_id):
+    replier_id_receive = request.form['replier_id_give']
+    reply_id_receive = request.form['reply_id_give']
+    #댓글 게시자 id와 현재 유저 id 비교 후 다를 경우 삭제 불가능 (!!보안!!)
+    if replier_id_receive != g.current_user:
+        return jsonify({'result': 'failure'})
+
+    result = db.replies.update_one(
+    {'post_id': post_id},  # 조건: 게시물 ID로 필터링
+    {'$pull': {'replies': {'reply_id': reply_id_receive}}}  # replies 배열에서 reply_id가 일치하는 항목을 삭제
+    )
+
+    if result:
+        return jsonify({'result': 'success'})
+    else:
+        return jsonify({'result': 'failure'})
+
 
 #POST HTML
 @app.route('/post')
@@ -214,7 +284,6 @@ def user_info_modify(user_id):
   #게시자 id와 현재 유저 id 비교 후 다를 경우 수정 불가능 (!!보안!!)
   if user_id != g.current_user:
     return jsonify({'result': 'failure'})
-  print('this')
 
   classR_receive = request.form['classR_give']
   OS_receive = request.form['OS_give']
@@ -301,6 +370,7 @@ def register():
 def register_user():
     # 데이터 유효성 검사
     username_receive = request.form['username_give']
+    user_profile_img = url_for('static', filename='images/default_profile.png')
     classR_receive = request.form['classR_give']
     OS_receive = request.form['OS_give']
     Email_receive = request.form['Email_give']
@@ -309,13 +379,11 @@ def register_user():
     place_receive = request.form['place_give']
 
     if not username_receive or not classR_receive or not ID_receive or not password_receive:
-        print('a')
         return jsonify({"result": "error", "message": "아이디와 비밀번호를 입력하세요."})
 
     # 기존 아이디 중복 확인
     existing_user = db.users.find_one({"ID": ID_receive})
     if existing_user:
-        print('b')
         return jsonify({"result": "error", "message": "이미 가입된 아이디 입니다."})
 
     # 비밀번호 해싱 (보안을 위해)
@@ -324,6 +392,7 @@ def register_user():
     # 사용자 정보 저장
     user = {
         "username": username_receive,
+        "profileImg": user_profile_img,
         "classR": classR_receive,
         "OS": OS_receive,
         "email": Email_receive,

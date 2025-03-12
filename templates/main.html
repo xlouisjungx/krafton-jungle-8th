@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,13 @@
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
   <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함하빈다. -->
   <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+  
+  
+  <script>window.history.scrollRestoration = "auto"</script>
 
   <title>{{title}}</title>
 
@@ -24,36 +28,65 @@
       margin-top: 1%;
       margin-right: 5%;
     }
+
     .post-button {
       display: flex;
       justify-content: right;
       margin-right: 5%;
     }
+
     .like-buttons {
       margin: auto;
     }
+
     .profile-image {
-      width: 100px;
-      height: 100px;
+      width: 140px;
+      height: 140px;
     }
     .profile-id {
       font-size: 30px;
     }
-    .delete-button {
-      margin-top: 20px;
+
+    .reply-box {
+      margin: 20px;
+      display: flex;
     }
-    .subtitle-margin-size{
+    .reply-content-box {
+      margin: 0 15px
+    }
+    .reply-profile-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 30px;
+      background-color: black;
+    }
+    .reply-font-size {
+      font-size: 12px;
+    }
+    .reply-delete-button-box {
+      display: flex;
+      justify-content: right;
+      margin-right: 30px;
+    }
+    .reply-delete-button{
+      font-size: 13px;
+    }
+
+    .subtitle-margin-size {
       margin: 0px
     }
-    #logout-button{
+    
+    #logout-button {
       margin-left: 10px;
+    }
+    .delete-button {
+      justify-content: right;
     }
   </style>
 
   <!-- JS Function -->
   <script>
     $(document).ready(function () {
-        $("#post-display").html("");
         showPosts();
     });
 
@@ -64,24 +97,31 @@
         data: {},
         success: function (response) {
           let posts = response["posts"];
+          let replies = response["replies"]
           for (let i = 0; i < posts.length; i++) {
-            makePost(
-              posts[i]["real_user_name"], 
-              posts[i]["_id"], 
-              posts[i]["image"], 
-              posts[i]["poster_id"], 
-              posts[i]["post_title"], 
-              posts[i]["post_content"], 
-              posts[i]["link"], 
-              posts[i]["like"], 
-              posts[i]["dislike"], 
-              posts[i]["post_time"],
-              posts[i]["title"], 
-              posts[i]["place"], 
-              posts[i]["phone_number"],
-            )
-          }
+            if ($(`#post-${posts[i]["_id"]}`).length === 0) {
+              makePost(
+                posts[i]["real_user_name"],
+                posts[i]["_id"],
+                posts[i]["image"],
+                posts[i]["poster_id"],
+                posts[i]["post_title"],
+                posts[i]["post_content"],
+                posts[i]["link"],
+                posts[i]["like"],
+                posts[i]["dislike"],
+                posts[i]["post_time"],
+                posts[i]["title"],
+                posts[i]["place"],
+                posts[i]["phone_number"],
+              )
+            }
 
+            let targetDoc = replies.find(doc => doc["post_id"] === posts[i]["_id"]);
+            if (targetDoc) {
+               $(`#reply-num-${posts[i]["_id"]}`).text(targetDoc.replies.length)
+            } 
+          }
           if (posts.length === 0) {
           }
         }
@@ -89,21 +129,21 @@
     }
 
     function makePost(
-      real_user_name, 
-      post_id, 
-      image, 
-      poster_id, 
-      post_title, 
-      post_content, 
-      link, 
-      likes, 
-      dislikes, 
+      real_user_name,
+      post_id,
+      image,
+      poster_id,
+      post_title,
+      post_content,
+      link,
+      likes,
+      dislikes,
       post_time,
       place_title,
       place_where,
       place_phone_number,
     ) {
-      let temp_html = /*html*/`<div class="tile is-parent">
+      let temp_html = /*html*/`<div id="post-${post_id}" class="tile is-parent">
                                 <article class="tile is-child box">
                                   <a href="/user_info/${poster_id}">
                                     <img class="profile-image">
@@ -114,7 +154,7 @@
                                     </a>
                                   <p>
                                   <div id="place-explanation">
-                                    ${place_title ? `<p><a href="${link}">${place_title}</a>에서</p>` : ''}
+                                    ${place_title ? `<p><a href="${link}" target='_blank'>${place_title}</a>에서</p>` : ''}
                                     <p>${post_time}${place_where ? ` ${place_where}` : ''}</p>
                                     ${place_phone_number ? `<p>${place_phone_number}</p>` : ''}
                                   </div>
@@ -123,19 +163,51 @@
                                   </figure>
                                   <p class="title">${post_title}</p>
                                   <p class="subtitle">${post_content}</p>
+                                  <a href="#" onclick="toggleShowReply('${post_id}'); return false;">
+                                    <span class="icon"><i class="fa-regular fa-comment-dots"></i></i></span><span id="reply-num-${post_id}"class="posts-reply">0</span>
+                                  </a>
                                   <a href="#" onclick="likePost('${post_id}')">
-                                    <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes">${likes}</span>
+                                    <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="posts-likes">${likes}</span>
                                   </a>
                                   <a href="#" onclick="dislikePost('${post_id}')">
-                                    <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
+                                    <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="posts-dislikes">${dislikes}</span>
                                   </a>
-                                  <div class="buttons delete-button" id="delete-${post_id}">
-                                    <button class="button is-danger" onclick="deletePost('${post_id}', '${poster_id}')">{{delete}}</button>
+                                  <div class="buttons delete-button" >
+                                    <button class="button is-danger" id="delete-${post_id}" onclick="deletePost('${post_id}', '${poster_id}')">{{delete}}</button>
+                                  </div>
+
+                                  <div id="reply-post-${post_id}" class="post" style="display: none;">
+                                    <div class="comment-section">
+                                      <article class="media">
+                                        <figure class="media-left">
+                                          <p class="image is-64x64">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" alt="Profile Image" />
+                                          </p>
+                                        </figure>
+                                        <div class="media-content">
+                                          <div class="field">
+                                            <p class="control">
+                                              <textarea id="reply-${post_id}-content" class="textarea" placeholder="댓글을 입력하세요..."></textarea>
+                                            </p>
+                                          </div>
+                                          <nav class="level">
+                                            <div class="level-left">
+                                              <div class="level-item">
+                                                <button class="button is-info comment-button" onclick="createReply('${post_id}')">전송</button>
+                                              </div>
+                                            </div>
+                                            
+                                          </nav>
+                                        </div>
+                                      </article>
+                                      <div id="comments-list-${post_id}" class="comments-list">
+                                      </div>
+                                    </div>
                                   </div>
                                 </article>
                       </div>`;
-      
-      
+
+
       $("#post-display").append(temp_html);
       if (poster_id !== '{{userid}}') {
         $(`#delete-${post_id}`).hide()
@@ -143,73 +215,179 @@
     }
 
     function deletePost(post_id, poster_id) {
-        $.ajax({
-          type: "POST",
-          url: "/main/post/delete",
-          data: { 
-            post_id_give: post_id, 
-            poster_id_give: poster_id 
-          },
-          success: function (response) {
-            if (response['result'] == 'success') {
-              alert('삭제 완료!')
-              $("#post-display").html("");
-              showPosts();
-            } else {
-              alert('삭제 실패ㅠㅠ')
-            }
+      $.ajax({
+        type: "POST",
+        url: "/main/post/delete",
+        data: {
+          post_id_give: post_id,
+          poster_id_give: poster_id
+        },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('삭제 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('삭제 실패ㅠㅠ')
           }
-        });
+        }
+      });
+    }
+
+    function likePost(post_id) {
+      $.ajax({
+        type: "POST",
+        url: "/main/post/like",
+        data: { post_id_give: post_id },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('맛있어요 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('맛있어요 실패ㅠㅠ')
+          }
+        }
+      });
+    }
+
+    function dislikePost(post_id) {
+      $.ajax({
+        type: "POST",
+        url: "/main/post/dislike",
+        data: { post_id_give: post_id },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('맛없어요 완료!')
+            $("#post-display").html("");
+            showPosts();
+          } else {
+            alert('맛없어요 실패ㅠㅠ')
+          }
+        }
+      });
+    }
+
+    function toggleShowReply(post_id) {
+      if ($(`#reply-post-${post_id}`).is(':visible')) {
+        $(`#reply-post-${post_id}`).hide()
+      } else {
+        $(`#reply-post-${post_id}`).show()
       }
 
-    function likePost(id) {
-        $.ajax({
-          type: "POST",
-          url: "/main/post/like",
-          data: { post_id_give: id },
-          success: function (response) {
-            if (response['result'] == 'success') {
-              alert('맛있어요 완료!')
-              $("#post-display").html("");
-              showPosts();
-            } else {
-              alert('맛있어요 실패ㅠㅠ')
+      $.ajax({
+        type: "GET",
+        url: `/main/reply/${post_id}`,
+        data: {},
+        success: function (response) {
+          let replies = response["replies"];
+          reply_list = replies["replies"]
+          if ($(`#reply-${replies["_id"]}`).length === 0) {
+            let temp_html = /*html*/`<div id="reply-${post_id}"></div>`
+            $(`#comments-list-${post_id}`).append(temp_html);
+            for (let i = 0; i < reply_list.length; i++) {
+              makeReplySession(
+                post_id,
+                reply_list[i]["reply_id"],
+                reply_list[i]["real_user_name"],
+                reply_list[i]["replier_id"],
+                reply_list[i]["reply_content"],
+                reply_list[i]["reply_time"],
+              )
             }
           }
-        });
-      }
+        }
+      })
+    }
 
-      function dislikePost(id) {
-        $.ajax({
-          type: "POST",
-          url: "/main/post/dislike",
-          data: { post_id_give: id },
-          success: function (response) {
-            if (response['result'] == 'success') {
-              alert('맛없어요 완료!')
-              $("#post-display").html("");
-              showPosts();
-            } else {
-              alert('맛없어요 실패ㅠㅠ')
-            }
-          }
-        });
-      }
+    function makeReplySession(post_id, reply_id, replier_name, replier_id, reply_content, reply_time) {
+      let temp_html = /*html*/`<div class="reply-box">
+                                  <div>
+                                    <a href="/user_info/${replier_id}">
+                                      <img class="reply-profile-image">
+                                    </a>
+                                  </div>
+                                  <div class="reply-content-box">
+                                    <p>
+                                      <a href="/user_info/${replier_id}">
+                                        ${replier_name}
+                                      </a>
+                                    </p>
+                                    <p class="reply-font-size">
+                                      ${reply_time}
+                                    </p>
+                                    <p class="reply-font-size">
+                                      ${reply_content}
+                                    </p>
+                                  </div>
+                                  </div>
+                                  <div class="reply-delete-button-box">
+                                    <a class="reply-delete-button reply-delete-${replier_id}" href="#" onclick="deleteReply('${post_id}','${replier_id}','${reply_id}')">
+                                      삭제
+                                    </a>
+                                  </div>
+      `
 
-      function logout() {
-        $.ajax({
-          type: "POST",
-          url: "/login/logout",
-          success: function (response) {
-            if (response['result'] == 'success') {
-              alert(response.message);  // "로그아웃 되었습니다." 메시지 표시
-              window.location.href = "/"; 
-            } else {
-              alert('로그아웃 실패ㅠㅠ')
-            }
-          }
-        });
+      $(`#reply-${post_id}`).append(temp_html);
+      if (replier_id !== '{{userid}}') {
+        $(`.reply-delete-${replier_id}`).hide()
       }
+    }
+
+    function createReply(post_id) {
+      reply_content = $(`#reply-${post_id}-content`).val()
+      const now = new Date();
+      const formattedDate = now.toString().split(" GMT")[0];
+      let reply_time = formattedDate
+
+      $.ajax({
+        type: "POST",
+        url: `/main/reply/${post_id}/create`,
+        data: {
+          reply_content_give: reply_content,
+          reply_time_give: reply_time
+        },
+        success: function (response) {
+          alert('댓글 달기 성공')
+          window.location.reload();
+        }
+      })
+    }
+
+    function deleteReply(post_id, replier_id, reply_id) {
+      $.ajax({
+        type: "POST",
+        url: `/main/reply/${post_id}/delete`,
+        data: {
+          replier_id_give: replier_id,
+          reply_id_give: reply_id,
+        },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert('댓글 삭제 성공')
+            window.location.reload();
+          } else {
+            alert('댓글 삭제 실패')
+            window.location.reload();
+          }
+        }
+      })
+    }
+
+    function logout() {
+      $.ajax({
+        type: "POST",
+        url: "/login/logout",
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert(response.message);  // "로그아웃 되었습니다." 메시지 표시
+            window.location.href = "/";
+          } else {
+            alert('로그아웃 실패ㅠㅠ')
+          }
+        }
+      });
+    }
   </script>
 </head>
 
@@ -234,8 +412,8 @@
     </a>
   </div>
 
-  <div id="post-display"> 
+  <div id="post-display">
   </div>
-
 </body>
+
 </html>
