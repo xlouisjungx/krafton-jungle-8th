@@ -18,6 +18,12 @@
   <title>{{title}}</title>
 
   <style>
+    .up-button {
+      display: flex;
+      justify-content: right;
+      margin-top: 1%;
+      margin-right: 5%;
+    }
     .post-button {
       display: flex;
       justify-content: right;
@@ -36,6 +42,10 @@
     .delete-button {
       margin-top: 20px;
     }
+
+    #logout-button{
+      margin-left: 10px;
+    }
   </style>
 
   <!-- JS Function -->
@@ -53,7 +63,7 @@
         success: function (response) {
           let posts = response["posts"];
           for (let i = 0; i < posts.length; i++) {
-            makePost(posts[i]["_id"], posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["dislike"], posts[i]["post_time"])
+            makePost(posts[i]["real_user_name"], posts[i]["_id"], posts[i]["image"], posts[i]["poster_id"], posts[i]["post_title"], posts[i]["post_content"], posts[i]["link"], posts[i]["like"], posts[i]["dislike"], posts[i]["post_time"])
           }
 
           if (posts.length === 0) {
@@ -63,7 +73,7 @@
       })
     }
 
-    function makePost(post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
+    function makePost(real_user_name, post_id, image, poster_id, post_title, post_content, link, likes, dislikes, post_time) {
       let temp_html = /*html*/`<div class="tile is-parent">
                                 <article class="tile is-child box">
                                   <a href="/user_info/${poster_id}">
@@ -71,7 +81,7 @@
                                   </a>
                                   <p class="profile-id">
                                     <a href="/user_info/${poster_id}">
-                                      ${poster_id}
+                                      ${real_user_name}
                                     </a>
                                   <p>
                                   <p class="subtitle">${post_time}</p>
@@ -87,7 +97,7 @@
                                     <span class="icon"><i class="fas fa-thumbs-down"></i></span><span class="movie-likes">${dislikes}</span>
                                   </a>
                                   <div class="buttons delete-button" id="delete-${post_id}">
-                                    <button class="button is-danger" onclick="deletePost('${post_id}')">{{delete}}</button>
+                                    <button class="button is-danger" onclick="deletePost('${post_id}', '${poster_id}')">{{delete}}</button>
                                   </div>
                                 </article>
                       </div>`;
@@ -98,11 +108,14 @@
       }
     }
 
-    function deletePost(id) {
+    function deletePost(post_id, poster_id) {
         $.ajax({
           type: "POST",
           url: "/main/post/delete",
-          data: { post_id_give: id },
+          data: { 
+            post_id_give: post_id, 
+            poster_id_give: poster_id 
+          },
           success: function (response) {
             if (response['result'] == 'success') {
               alert('삭제 완료!')
@@ -148,10 +161,32 @@
           }
         });
       }
+
+      function logout() {
+        $.ajax({
+          type: "POST",
+          url: "/login/logout",
+          success: function (response) {
+            if (response['result'] == 'success') {
+              alert(response.message);  // "로그아웃 되었습니다." 메시지 표시
+              window.location.href = "/"; 
+            } else {
+              alert('로그아웃 실패ㅠㅠ')
+            }
+          }
+        });
+      }
   </script>
 </head>
 
 <body>
+  <div class="up-button">
+    <a href="/user_info/{{username}}">
+      <button class="button is-info">내 정보</button>
+    </a>
+    <button id="logout-button" class="button is-danger" onclick="logout()">로그아웃</button>
+  </div>
+
   <section class="section">
     <div class="container has-text-centered">
       <h2 class="title">{{heading}}</h2>
