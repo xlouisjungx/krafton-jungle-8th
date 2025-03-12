@@ -37,16 +37,18 @@ app.json = CustomJSONProvider(app)
 @app.before_request
 def load_current_user():
     g.current_user = None
-    if request.endpoint != 'login':  # '/login' 라우트에서는 토큰 검증을 하지 않음
+    if request.endpoint in ['login', 'login_user', 'register', 'register_user']:
+        return
+    else: 
+        # '/login' 라우트에서는 토큰 검증을 하지 않음
         # 다른 라우트에서는 토큰을 검증하고, 'g.current_user'를 설정
         token = request.cookies.get('access_token')
-        print(token)
         if token:
             payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
             user_id = payload["user_id"]
-            g.current_user = user_id #토큰 삽입 수정 필요??
+            g.current_user = user_id
         else:
-            g.current_user = None
+            return redirect(url_for('login'))
 
 #전체 템플릿에서 사용할 전역변수 설정
 @app.context_processor
@@ -93,7 +95,12 @@ def handle_post():
       link_receive = request.form['link_give']
       post_time_receive = request.form['post_time_give']
 
+      real_user_name_json = db.users.find_one({"ID": g.current_user}, {"username": 1, "_id": 0})
+      real_user_name = real_user_name_json['username']
+      print(real_user_name)
+
       post = {
+        'real_user_name': real_user_name,
         'poster_id': poster_id_receive,
         'image': image_receive,
         'post_title': post_title_receive,
@@ -110,8 +117,11 @@ def handle_post():
 @app.route('/main/post/delete', methods=['POST'])
 def delete_post():
   temp_id_receive = request.form['post_id_give']
+  poster_id_receive = request.form['poster_id_give']
+  if poster_id_receive != g.current_user:
+      return jsonify({'result': 'failure'})
+  
   id_receive = ObjectId(temp_id_receive)
-
   result = db.post.delete_one({'_id': id_receive})
 
   if result.deleted_count == 1:
@@ -166,14 +176,14 @@ def login():
 
 @app.route('/login/signIn', methods=["POST"])
 def login_user():
-    Email_receive = request.form['Email_give']
+    ID_receive = request.form['ID_give']
     password_receive = request.form['password_give']
 
-    if not Email_receive or not password_receive:
-        return jsonify({"result": "error", "message": "이메일과 비밀번호를 입력하세요."})
+    if not ID_receive or not password_receive:
+        return jsonify({"result": "error", "message": "아이디과 비밀번호를 입력하세요."})
 
     # 사용자 조회
-    user = db.users.find_one({"email": Email_receive})
+    user = db.users.find_one({"ID": ID_receive})
     if not user:
         return jsonify({"result": "error", "message": "사용자가 존재하지 않습니다. 회원가입 해주세요."})
 
@@ -190,6 +200,12 @@ def login_user():
     response = make_response(jsonify({"result": "success", "token": token}))
     response.set_cookie('access_token', token, httponly=True, secure=False, samesite='Strict', max_age=3600)
 
+    return response
+
+@app.route('/login/logout', methods=["POST"])
+def logout_user():
+    response = make_response(jsonify({"result": "success", "message": "로그아웃 되었습니다."}))
+    response.set_cookie('access_token', '', max_age=0)  # 쿠키 삭제
     return response
 
 # 보호된 API 예시 (JWT 인증)
@@ -251,7 +267,6 @@ def register_user():
     }
 
     try:
-        print('save')
         db.users.insert_one(user)
         return jsonify({"result": "success", "message": "회원가입 완료! 로그인 페이지로 이동합니다."})
     except Exception as e:
