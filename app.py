@@ -10,9 +10,11 @@ import jwt
 from datetime import datetime, timedelta
 #링크 분석기
 from link_analyzer import analyze_link
+#우분투 서버 로그 분석기
+from logger import logger
 
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@13.124.104.3', 27017)
 db = client.jungle_sunday
 
 app = Flask(__name__)
@@ -64,6 +66,7 @@ def inject_user():
 #INDEX ROUTE
 @app.route('/')
 def index():
+    logger.info('start')
     if g.current_user != None:
         #로그인되어 있을 경우 메인으로
         return redirect(url_for('main'))
